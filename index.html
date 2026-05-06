@@ -4,55 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Abreu Manager Pro</title>
+
+  <!-- 🔤 Fuente -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
   <style>
+    /* 🎨 ESTILOS GENERALES */
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
       background: #0f172a;
       color: #fff;
     }
+
     header {
       display: flex;
       justify-content: space-between;
-      padding: 20px 40px;
+      padding: 20px;
       background: #020617;
     }
-    header h1 { color: #22c55e; }
-    nav a {
-      margin-left: 20px;
-      color: #fff;
-      text-decoration: none;
-    }
+
+    h1 { color: #22c55e; }
+
     .hero {
       text-align: center;
-      padding: 100px 20px;
+      padding: 80px 20px;
     }
-    .hero h2 { font-size: 2.5rem; }
-    .hero button {
-      margin: 10px;
-      padding: 12px 25px;
+
+    .btn {
+      padding: 10px 20px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      margin: 5px;
     }
-    .btn-primary { background: #22c55e; color: #000; }
-    .btn-secondary { background: #334155; color: #fff; }
+
+    .primary { background: #22c55e; color: #000; }
+    .secondary { background: #334155; color: #fff; }
+
     .section {
-      padding: 60px 20px;
+      padding: 50px 20px;
       text-align: center;
     }
+
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      padding: 20px;
+      gap: 15px;
+      margin-top: 20px;
     }
+
     .card {
       background: #1e293b;
       padding: 20px;
       border-radius: 10px;
     }
+
+    input {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      margin: 10px;
+    }
+
     footer {
       background: #020617;
       padding: 20px;
@@ -61,83 +75,116 @@
     }
   </style>
 </head>
+
 <body>
 
+<!-- 🔝 HEADER -->
 <header>
   <h1>Abreu Manager Pro</h1>
-  <nav>
-    <a href="#features">Funciones</a>
-    <a href="#pricing">Planes</a>
-    <a href="#contact">Contacto</a>
-  </nav>
+  <div>
+    <button class="btn secondary">Login</button>
+  </div>
 </header>
 
+<!-- 🚀 HERO -->
 <section class="hero">
-  <h2>Gestiona tus clientes fitness como un profesional</h2>
-  <p>Controla rutinas, progreso y pagos desde una sola plataforma.</p>
-  <button class="btn-primary" onclick="startApp()">Empezar gratis</button>
-  <button class="btn-secondary">Ver demo</button>
+  <!-- ✏️ EDITA AQUÍ -->
+  <h2>Gestiona tus clientes como un profesional</h2>
+  <p>
+    Controla rutinas, progreso y pagos desde una sola plataforma.
+  </p>
+
+  <button class="btn primary">Empezar gratis</button>
+  <button class="btn secondary">Ver demo</button>
 </section>
 
-<section id="features" class="section">
-  <h2>Funciones</h2>
+<!-- ⚡ FUNCIONES -->
+<section class="section">
+  <h2>Funciones principales</h2>
+
   <div class="cards">
     <div class="card">Gestión de clientes</div>
     <div class="card">Rutinas personalizadas</div>
     <div class="card">Control de pagos</div>
-    <div class="card">Acceso desde móvil</div>
+    <div class="card">Seguimiento de progreso</div>
   </div>
 </section>
 
+<!-- 👥 CLIENTES (APP REAL) -->
 <section class="section">
-  <h2>Dashboard</h2>
-  <div class="cards" id="clientsList"></div>
-  <input type="text" id="clientName" placeholder="Nombre cliente">
-  <button onclick="addClient()">Agregar</button>
+  <h2>Clientes</h2>
+
+  <!-- ✏️ INPUT -->
+  <input type="text" id="clientName" placeholder="Nombre del cliente">
+
+  <!-- ➕ BOTÓN -->
+  <button class="btn primary" onclick="addClient()">Agregar</button>
+
+  <!-- 📋 LISTA -->
+  <div class="cards" id="clientList"></div>
 </section>
 
-<section id="pricing" class="section">
+<!-- 💰 PLANES -->
+<section class="section">
   <h2>Planes</h2>
+
   <div class="cards">
-    <div class="card">Básico - Gratis</div>
-    <div class="card">PRO - Próximamente</div>
+    <div class="card">Gratis</div>
+    <div class="card">PRO (Próximamente)</div>
   </div>
 </section>
 
-<section id="contact" class="section">
+<!-- 📞 CONTACTO -->
+<section class="section">
   <h2>Contacto</h2>
-  <p>Email: contacto@abreumanager.com</p>
+
+  <!-- ✏️ EDITA AQUÍ -->
+  <p>contacto@abreumanager.com</p>
 </section>
 
+<!-- 🔻 FOOTER -->
 <footer>
-  <p>© 2026 Abreu Manager Pro - Todos los derechos reservados</p>
+  <p>© 2026 Abreu Manager Pro</p>
 </footer>
 
+<!-- ⚙️ JAVASCRIPT -->
 <script>
+  // 🧠 ARRAY DE CLIENTES
   let clients = [];
 
-  function startApp() {
-    alert("Bienvenido a Abreu Manager Pro 🚀");
-  }
-
+  // ➕ AGREGAR CLIENTE
   function addClient() {
-    const name = document.getElementById("clientName").value;
-    if (name === "") return;
+    const input = document.getElementById("clientName");
+    const name = input.value;
+
+    if (!name) return;
+
     clients.push(name);
+    input.value = "";
+
     renderClients();
   }
 
+  // 🔄 RENDERIZAR CLIENTES
   function renderClients() {
-    const list = document.getElementById("clientsList");
+    const list = document.getElementById("clientList");
     list.innerHTML = "";
-    clients.forEach((c, i) => {
+
+    clients.forEach((client, index) => {
       const div = document.createElement("div");
       div.className = "card";
-      div.innerHTML = c + " <button onclick='deleteClient(" + i + ")'>❌</button>";
+
+      div.innerHTML = `
+        ${client}
+        <br><br>
+        <button onclick="deleteClient(${index})">❌</button>
+      `;
+
       list.appendChild(div);
     });
   }
 
+  // ❌ ELIMINAR CLIENTE
   function deleteClient(index) {
     clients.splice(index, 1);
     renderClients();
