@@ -189,6 +189,105 @@ body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden;tran
 .divider{height:1px;background:var(--bd);margin:2px 0}
 .pill-list-item{padding:11px 0;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:8px}
 .pill-list-item:last-child{border-bottom:none}
+
+/* ══════ FAB LATERAL OCULTO CON SWIPE ══════ */
+#fab-wrap {
+  position: fixed;
+  bottom: calc(85px + var(--sb));
+  right: 0;
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  /* Panel deslizante oculto a la derecha */
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-right: none;
+  border-radius: 14px 0 0 14px;
+  padding: 10px 10px 10px 12px;
+  gap: 8px;
+  box-shadow: -4px 0 24px rgba(0,0,0,.5);
+  transform: translateX(100%);
+  transition: transform .32s cubic-bezier(.32,.72,0,1);
+}
+#fab-wrap.fab-open {
+  transform: translateX(0);
+}
+/* Pestaña visible siempre para indicar que hay menú */
+#fab-tab {
+  position: fixed;
+  bottom: calc(140px + var(--sb));
+  right: 0;
+  z-index: 98;
+  width: 22px;
+  height: 56px;
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-right: none;
+  border-radius: 10px 0 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: -3px 0 12px rgba(0,0,0,.4);
+  transition: all .2s;
+  font-size: 11px;
+  color: var(--t2);
+  writing-mode: vertical-rl;
+  flex-direction: column;
+  gap: 0;
+}
+#fab-tab::after {
+  content: '‹';
+  font-size: 14px;
+  color: var(--ac);
+  font-weight: 800;
+  transition: transform .3s;
+}
+#fab-wrap.fab-open ~ #fab-tab::after,
+body.fab-open-state #fab-tab::after {
+  transform: rotate(180deg);
+}
+.fab-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all .15s;
+  box-shadow: none;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.fab-btn:active {
+  transform: scale(.92);
+  background: var(--s3);
+}
+.fab-btn span {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--t2);
+  letter-spacing: .2px;
+  text-transform: uppercase;
+  font-family: var(--fb);
+  line-height: 1;
+}
+/* Overlay para cerrar el FAB al tocar fuera */
+#fab-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 97;
+  display: none;
+}
+#fab-overlay.show {
+  display: block;
+}
 </style>
 </head>
 <body>
@@ -370,7 +469,7 @@ body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden;tran
   </div>
 </section>
 
-<!-- ══════ NUEVA: COMPARAR PROGRESO ══════ -->
+<!-- COMPARAR PROGRESO -->
 <section id="page-comparar" class="page">
   <div><div class="sth">Comparar 📊</div><div class="stsub">Hasta 4 clientes a la vez</div></div>
   <div class="card" style="padding:13px">
@@ -387,7 +486,7 @@ body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden;tran
   <div class="card" id="comp-table-wrap"></div>
 </section>
 
-<!-- ══════ NUEVA: PLANTILLAS ══════ -->
+<!-- PLANTILLAS -->
 <section id="page-plantillas" class="page">
   <div class="row">
     <div><div class="sth">Plantillas 📋</div><div class="stsub">Rutinas reutilizables</div></div>
@@ -466,6 +565,27 @@ body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden;tran
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- FAB LATERAL DESLIZANTE -->
+<div id="fab-overlay" onclick="closeFab()"></div>
+
+<div id="fab-wrap">
+  <button class="fab-btn" onclick="closeFab();showPage('comparar')" title="Comparar">
+    📊<span>Comparar</span>
+  </button>
+  <button class="fab-btn" onclick="closeFab();showPage('plantillas')" title="Plantillas">
+    📋<span>Plantillas</span>
+  </button>
+  <button class="fab-btn" onclick="closeFab();showPage('calc')" title="Calculadoras">
+    🧮<span>Calc.</span>
+  </button>
+  <button class="fab-btn" onclick="closeFab();showPage('ajustes')" title="Ajustes">
+    ⚙️<span>Ajustes</span>
+  </button>
+</div>
+
+<!-- Pestaña que siempre se ve en el borde derecho -->
+<div id="fab-tab" onclick="toggleFab()" title="Menú rápido"></div>
 
 <div class="cov" id="cov-confirm">
   <div class="cdlg">
@@ -674,7 +794,6 @@ body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden;tran
   </div>
 </div></div>
 
-<!-- ══════ NUEVO: SHEET PLANTILLA ══════ -->
 <div class="ov" id="ov-template" onclick="closeSheet('template')"><div class="sheet" onclick.stop>
   <div class="sh"></div>
   <div class="shdr"><div class="shtt">Nueva plantilla 📋</div><button class="btn btn-s btn-sm btn-ico" onclick="closeSheet('template')">✕</button></div>
@@ -703,14 +822,6 @@ body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden;tran
     <button class="btn btn-p btn-full" onclick="saveTemplate()">💾 Guardar plantilla</button>
   </div>
 </div></div>
-
-<!-- FAB -->
-<div style="position:fixed;bottom:calc(85px + var(--sb));right:14px;z-index:99;display:flex;flex-direction:column;gap:8px" id="fab-wrap">
-  <button class="btn btn-s btn-ico" style="box-shadow:var(--shadow);width:40px;height:40px" onclick="showPage('comparar')" title="Comparar">📊</button>
-  <button class="btn btn-s btn-ico" style="box-shadow:var(--shadow);width:40px;height:40px" onclick="showPage('plantillas')" title="Plantillas">📋</button>
-  <button class="btn btn-s btn-ico" style="box-shadow:var(--shadow);width:40px;height:40px" onclick="showPage('calc')" title="Calculadoras">🧮</button>
-  <button class="btn btn-s btn-ico" style="box-shadow:var(--shadow);width:40px;height:40px" onclick="showPage('ajustes')" title="Ajustes">⚙️</button>
-</div>
 
 <div class="ov" id="ov-pin" onclick="closeSheet('pin')"><div class="sheet" onclick.stop>
   <div class="sh"></div>
@@ -793,6 +904,54 @@ let pinMode='enter';
 let compClients=[];
 let compMetric='weight';
 let compChart=null;
+let fabOpen=false;
+
+// ══════ FAB LATERAL CON SWIPE ══════
+function toggleFab(){
+  fabOpen=!fabOpen;
+  document.getElementById('fab-wrap').classList.toggle('fab-open',fabOpen);
+  document.getElementById('fab-overlay').classList.toggle('show',fabOpen);
+  // Actualizar flecha de la pestaña
+  document.getElementById('fab-tab').style.setProperty('--arrow-rot', fabOpen ? '0deg' : '180deg');
+  if(fabOpen){
+    document.getElementById('fab-tab').style.cssText+='';
+    // Forzar re-render del after
+  }
+}
+function closeFab(){
+  fabOpen=false;
+  document.getElementById('fab-wrap').classList.remove('fab-open');
+  document.getElementById('fab-overlay').classList.remove('show');
+}
+function openFab(){
+  fabOpen=true;
+  document.getElementById('fab-wrap').classList.add('fab-open');
+  document.getElementById('fab-overlay').classList.add('show');
+}
+
+// Swipe desde borde derecho para abrir el FAB
+(function initSwipe(){
+  let touchStartX=0, touchStartY=0, touchStartTime=0;
+  document.addEventListener('touchstart', e=>{
+    touchStartX=e.touches[0].clientX;
+    touchStartY=e.touches[0].clientY;
+    touchStartTime=Date.now();
+  },{passive:true});
+  document.addEventListener('touchend', e=>{
+    const dx=touchStartX-e.changedTouches[0].clientX;
+    const dy=Math.abs(touchStartY-e.changedTouches[0].clientY);
+    const dt=Date.now()-touchStartTime;
+    const screenW=window.innerWidth;
+    // Swipe desde borde derecho (últimos 22px) hacia la izquierda → ABRIR
+    if(touchStartX>screenW-22 && dx>30 && dy<60 && dt<400){
+      openFab();return;
+    }
+    // Swipe hacia la derecha cuando está abierto → CERRAR
+    if(fabOpen && dx<-40 && dy<60 && dt<400){
+      closeFab();
+    }
+  },{passive:true});
+})();
 
 document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('.sheet').forEach(s=>s.addEventListener('click',e=>e.stopPropagation()));
@@ -1281,7 +1440,6 @@ function renderProgresoTab(id){
       <div class="chart-metric-btns">${metrics.map(m=>`<button class="cmbtn${m.k===currentChartMetric?' active':''}" onclick="changeChartMetric('${id}','${m.k}',this)">${m.l}</button>`).join('')}</div>
       <div class="chart-wrap"><canvas id="progress-chart"></canvas></div>
     </div>`;
-  // Resultados calculadoras guardados
   const calcResults=getCalcResults(id);
   if(calcResults.length){
     html+=`<div class="card" style="padding:13px;margin-bottom:8px">
@@ -1419,7 +1577,6 @@ function renderPagosTab(id){
     <div style="text-align:right;font-size:11px;color:var(--t2)">Total: <strong style="color:var(--ac);font-family:var(--fd);font-size:14px">$${fmtMoney(total)}</strong></div>`}`;
 }
 
-// ══════ CALCULADORAS CON GUARDAR EN PERFIL ══════
 function switchCalcTab(tab,btn){
   calcTab=tab;
   document.querySelectorAll('#page-calc .tab').forEach(t=>t.classList.remove('active'));
@@ -1525,7 +1682,6 @@ function calcMacros(){
   </div>`;
 }
 
-// ══════ INCOME CHART ══════
 let incomeChart=null;
 function renderIncomeChart(){
   const canvas=document.getElementById('income-chart');if(!canvas)return;
@@ -1545,7 +1701,6 @@ function renderIncomeChart(){
   });
 }
 
-// ══════ AGENDA ══════
 let agendaDate=new Date();
 function renderAgenda(){
   const now=new Date();const week=[];
@@ -1585,7 +1740,6 @@ function openSessionSheetDirect(id,date){
   document.getElementById('sess-mood').value='4';openSheet('session');
 }
 
-// ══════ GLOBAL SEARCH ══════
 function globalSearch(){
   const q=(document.getElementById('global-search')?.value||'').trim().toLowerCase();
   const el=document.getElementById('search-results');
@@ -1600,7 +1754,6 @@ function globalSearch(){
   el.innerHTML=html;
 }
 
-// ══════ FAVORITES ══════
 function toggleFav(id){
   const isFav=DB.get('fav_'+id);
   if(isFav)DB.del('fav_'+id);else DB.set('fav_'+id,true);
@@ -1609,7 +1762,6 @@ function toggleFav(id){
   showToast(isFav?'Quitado de favoritos':'⭐ Agregado a favoritos');renderClientList();
 }
 
-// ══════ GOALS ══════
 function openGoalsSheet(id){
   document.getElementById('goals-cid').value=id;const goals=getGoals(id);
   const container=document.getElementById('goal-rows');container.innerHTML='';
@@ -1659,7 +1811,6 @@ function renderMetasTab(id){
   }).join(''));
 }
 
-// ══════ SESSION NOTES ══════
 function openSessionSheet(id){
   document.getElementById('sess-cid').value=id;document.getElementById('sess-date').value=today();
   document.getElementById('sess-note').value='';document.getElementById('sess-type').value='Entrenamiento general';
@@ -1689,7 +1840,6 @@ async function deleteSession(cid,sid){
   DB.set('sessions_'+cid,getSessions(cid).filter(x=>x.id!==sid));showToast('🗑️ Eliminada');renderProfile(cid);
 }
 
-// ══════ COMPARAR PROGRESO ══════
 const COMP_COLORS=['#c8ff57','#57c8ff','#ff5f57','#ffca28'];
 const METRIC_LABELS={weight:'Peso (kg)',fat:'Grasa (%)',waist:'Cintura (cm)',chest:'Pecho (cm)'};
 
@@ -1764,7 +1914,6 @@ function renderCompTable(){
   wrap.innerHTML=rows||`<div class="es"><div class="ei">📊</div><div class="et">Sin datos</div></div>`;
 }
 
-// ══════ PLANTILLAS ══════
 function renderTemplateList(){
   const list=document.getElementById('templates-list');if(!list)return;
   const tpls=getTemplates();
@@ -1809,7 +1958,6 @@ function assignTemplateToClient(tplId){
   showToast(`💡 Abre el perfil del cliente → Rutina para asignar`);
 }
 
-// ══════ EXPORTAR PDF ══════
 function exportClientPDF(id){
   const c=DB.clients().find(x=>x.id===id);if(!c){showToast('Cliente no encontrado');return;}
   const pays=getPayments(id);const prog=[...getProgress(id)].sort((a,b)=>new Date(a.date)-new Date(b.date));
@@ -1857,7 +2005,6 @@ function exportClientPDF(id){
   showToast('📄 Reporte descargado — ábrelo y usa Ctrl+P para PDF');
 }
 
-// ══════ EXPORT / IMPORT / CLEAR ══════
 function haptic(t=30){try{if(navigator.vibrate)navigator.vibrate(t);}catch{}}
 function exportData(){
   const clients=DB.clients();
