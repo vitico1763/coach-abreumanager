@@ -1517,4 +1517,523 @@ function handlePhotoUpload(id,type,e){
   const f=e.target.files[0];if(!f)return;
   if(f.size>3145728){showToast('⚠️ Foto muy grande (máx 3MB)');return;}
   const r=new FileReader();
-  r.onload=ev=>{const photos=getPhotos(id);
+  r.onload=ev=>{const photos=getPhotos(id);photos[type]=ev.target.result;DB.set('photos_'+id,photos);showToast('✅ Foto guardada');document.getElementById('tab-content').innerHTML=renderFotosTab(id);};
+  r.readAsDataURL(f);
+}
+async function clearPhotos(id){
+  const ok=await showConfirm('¿Eliminar fotos?','🗑️','Eliminar');if(!ok)return;
+  DB.del('photos_'+id);showToast('🗑️ Eliminadas');document.getElementById('tab-content').innerHTML=renderFotosTab(id);
+}
+
+function renderRutinasTab(id){
+  const routines=getRoutines(id);
+  if(!routines.length)return`<div class="es"><div class="ei">🏋️</div><div class="et">Sin rutinas</div><div class="esub">Toca Rutina para agregar</div></div>`;
+  return routines.map(r=>`
+    <div class="card" style="margin-bottom:7px">
+      <div style="padding:11px 13px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:700;font-size:13px">${r.name}</div><div style="font-size:10px;color:var(--t2);margin-top:1px">${r.days} · ${r.duration}${r.types?' · '+r.types:''}</div></div>
+        <button onclick="deleteRoutine('${id}','${r.id}')" class="btn btn-d btn-sm" style="padding:3px 8px;font-size:11px">🗑️</button>
+      </div>
+      <div style="padding:9px 13px;display:flex;flex-direction:column;gap:5px">
+        ${(r.exercises||[]).map((ex,i)=>`<div style="display:flex;align-items:center;gap:8px;background:var(--s2);border-radius:8px;padding:8px 10px"><div style="width:22px;height:22px;border-radius:6px;background:rgba(200,255,87,.1);color:var(--ac);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:10px;flex-shrink:0">${i+1}</div><div><div style="font-weight:600;font-size:12px">${ex.name}</div><div style="font-size:10px;color:var(--t2)">${[ex.sets&&ex.sets+'s',ex.reps&&ex.reps+'r',ex.rest&&ex.rest+'s desc'].filter(Boolean).join(' · ')}</div></div></div>`).join('')}
+        ${r.notes?`<div style="font-size:10px;color:var(--t2);padding-top:2px">📝 ${r.notes}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function renderDietaTab(id){
+  const meals=getMeals(id);
+  if(!meals.length)return`<div class="es"><div class="ei">🥗</div><div class="et">Sin planes</div><div class="esub">Toca Dieta para agregar</div></div>`;
+  return meals.map(m=>`
+    <div class="card" style="margin-bottom:7px">
+      <div style="padding:11px 13px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:700;font-size:13px">${m.name}</div><div style="font-size:10px;color:var(--t2);margin-top:1px">${[m.calories&&m.calories+'kcal',m.protein&&'P:'+m.protein+'g',m.carbs&&'C:'+m.carbs+'g',m.fats&&'G:'+m.fats+'g'].filter(Boolean).join(' · ')}</div></div>
+        <button onclick="deleteMeal('${id}','${m.id}')" class="btn btn-d btn-sm" style="padding:3px 8px;font-size:11px">🗑️</button>
+      </div>
+      <div style="padding:9px 13px;display:flex;flex-direction:column;gap:5px">
+        ${(m.meals||[]).map(ml=>`<div style="background:var(--s2);border-radius:8px;padding:8px 10px"><div style="font-size:9px;color:var(--ac);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">${ml.time}</div><div style="font-weight:500;font-size:12px">${ml.food}</div></div>`).join('')}
+        ${m.notes?`<div style="font-size:10px;color:var(--t2);padding-top:2px">📝 ${m.notes}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function renderPagosTab(id){
+  const pays=getPayments(id);const st=payStatus(pays);const pl=payLabel(st);
+  const sorted=[...pays].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const total=pays.reduce((s,p)=>s+parseFloat(p.amount||0),0);
+  return`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="font-size:10px;padding:3px 9px;border-radius:5px;background:${pl.bg};color:${pl.color};font-weight:600">${pl.text}</span>
+      <button class="btn btn-p btn-sm" onclick="openPaymentSheet('${id}')">+ Pago</button>
+    </div>
+    ${!pays.length?`<div class="es"><div class="ei">💰</div><div class="et">Sin pagos</div></div>`:`
+    <div class="card" style="padding:0 13px;margin-bottom:7px">
+      ${sorted.map(p=>`<div class="pi">
+        <div style="flex:1"><div class="pa">$${fmtMoney(p.amount)}</div><div style="font-size:10px;color:var(--t2);margin-top:1px">${fmtDate(p.date)}${p.concept?' · '+p.concept:''}</div>${p.nextDate?`<div style="font-size:10px;color:var(--t3);margin-top:1px">Próximo: ${fmtDate(p.nextDate)}</div>`:''}</div>
+        <span style="font-size:10px;padding:2px 7px;border-radius:5px;background:var(--s2);color:var(--t2);font-weight:500">${p.method}</span>
+        <button onclick="deletePayment('${id}','${p.id}')" style="background:none;border:none;color:var(--rd);cursor:pointer;font-size:14px">✕</button>
+      </div>`).join('')}
+    </div>
+    <div style="text-align:right;font-size:11px;color:var(--t2)">Total: <strong style="color:var(--ac);font-family:var(--fd);font-size:14px">$${fmtMoney(total)}</strong></div>`}`;
+}
+
+function switchCalcTab(tab,btn){
+  calcTab=tab;
+  document.querySelectorAll('#page-calc .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['imc','tmb','macros'].forEach(t=>document.getElementById('calc-'+t).style.display=t===tab?'block':'none');
+}
+function bmiCategory(b){
+  if(b<18.5)return{label:'Bajo peso',color:'#57c8ff'};
+  if(b<25)return{label:'Normal ✅',color:'#c8ff57'};
+  if(b<30)return{label:'Sobrepeso',color:'#ffca28'};
+  return{label:'Obesidad',color:'#ff5f57'};
+}
+function clientOptsHTML(){
+  return DB.clients().map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
+function saveCalcResult(type,value){
+  const sel=document.getElementById('calc-save-client-'+type);
+  if(!sel||!sel.value){showToast('⚠️ Selecciona un cliente');return;}
+  const clientId=sel.value;
+  const results=getCalcResults(clientId);
+  results.unshift({id:uid(),type,value,date:today()});
+  DB.set('calc_results_'+clientId,results.slice(0,20));
+  const clientName=DB.clients().find(c=>c.id===clientId)?.name||'cliente';
+  showToast(`✅ ${type} guardado en perfil de ${clientName.split(' ')[0]}`);
+}
+function calcIMC(){
+  const w=parseFloat(document.getElementById('c-weight').value);
+  const h=parseFloat(document.getElementById('c-height').value)/100;
+  const el=document.getElementById('imc-result');
+  if(!w||!h||h<=0){el.innerHTML='';return;}
+  const bmi=(w/(h*h)).toFixed(1);const cat=bmiCategory(parseFloat(bmi));
+  const opts=clientOptsHTML();
+  el.innerHTML=`<div class="calc-result">
+    <div class="calc-val">${bmi}</div>
+    <div class="calc-label">IMC — <span style="color:${cat.color};font-weight:600">${cat.label}</span></div>
+    <div class="calc-range" style="margin-top:10px">
+      <div class="cr-item" style="background:rgba(87,200,255,.15);color:var(--ac2)">Bajo<br>&lt;18.5</div>
+      <div class="cr-item" style="background:rgba(200,255,87,.15);color:var(--ac)">Normal<br>18.5–25</div>
+      <div class="cr-item" style="background:rgba(255,202,40,.15);color:var(--yw)">Sobre<br>25–30</div>
+      <div class="cr-item" style="background:rgba(255,95,87,.15);color:var(--rd)">Obeso<br>&gt;30</div>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--t2)">Peso ideal (IMC 22): <strong style="color:var(--tx)">${(22*h*h).toFixed(1)} kg</strong></div>
+    ${opts?`<div style="margin-top:10px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);padding:10px">
+      <div style="font-size:10px;font-weight:600;color:var(--t2);letter-spacing:.3px;text-transform:uppercase;margin-bottom:7px">Guardar en perfil</div>
+      <div style="display:flex;gap:7px">
+        <select class="fs" id="calc-save-client-IMC" style="flex:1;font-size:11px;padding:7px">${opts}</select>
+        <button class="btn btn-p btn-sm" onclick="saveCalcResult('IMC','${bmi}')">💾</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+function calcTMB(){
+  const w=parseFloat(document.getElementById('t-weight').value);
+  const h=parseFloat(document.getElementById('t-height').value);
+  const a=parseFloat(document.getElementById('t-age').value);
+  const g=document.getElementById('t-gender').value;
+  const act=parseFloat(document.getElementById('t-activity').value);
+  const el=document.getElementById('tmb-result');
+  if(!w||!h||!a){el.innerHTML='';return;}
+  const tmb=g==='m'?88.36+(13.4*w)+(4.8*h)-(5.7*a):447.6+(9.2*w)+(3.1*h)-(4.3*a);
+  const tdee=Math.round(tmb*act);const opts=clientOptsHTML();
+  el.innerHTML=`<div class="calc-result">
+    <div class="calc-val">${Math.round(tmb)} <span style="font-size:14px;color:var(--t2)">kcal</span></div>
+    <div class="calc-label">Metabolismo basal (TMB)</div>
+    <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+      <div style="background:var(--s2);border-radius:8px;padding:8px;text-align:center"><div style="font-family:var(--fd);font-size:14px;font-weight:800;color:var(--rd)">${Math.round(tdee-500)}</div><div style="font-size:9px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:.3px">Déficit</div></div>
+      <div style="background:rgba(200,255,87,.08);border:1px solid rgba(200,255,87,.2);border-radius:8px;padding:8px;text-align:center"><div style="font-family:var(--fd);font-size:14px;font-weight:800;color:var(--ac)">${tdee}</div><div style="font-size:9px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:.3px">Mant.</div></div>
+      <div style="background:var(--s2);border-radius:8px;padding:8px;text-align:center"><div style="font-family:var(--fd);font-size:14px;font-weight:800;color:var(--pu)">${Math.round(tdee+300)}</div><div style="font-size:9px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:.3px">Volumen</div></div>
+    </div>
+    ${opts?`<div style="margin-top:10px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);padding:10px">
+      <div style="font-size:10px;font-weight:600;color:var(--t2);letter-spacing:.3px;text-transform:uppercase;margin-bottom:7px">Guardar en perfil</div>
+      <div style="display:flex;gap:7px">
+        <select class="fs" id="calc-save-client-TMB" style="flex:1;font-size:11px;padding:7px">${opts}</select>
+        <button class="btn btn-p btn-sm" onclick="saveCalcResult('TMB','${tdee} kcal')">💾</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+function calcMacros(){
+  const cals=parseFloat(document.getElementById('m-cals').value);
+  const goal=document.getElementById('m-goal').value;
+  const el=document.getElementById('macros-result');
+  if(!cals){el.innerHTML='';return;}
+  let p,c,f;
+  if(goal==='deficit'){p=Math.round(cals*.35/4);f=Math.round(cals*.25/9);c=Math.round(cals*.4/4);}
+  else if(goal==='volumen'){p=Math.round(cals*.3/4);f=Math.round(cals*.25/9);c=Math.round(cals*.45/4);}
+  else{p=Math.round(cals*.3/4);f=Math.round(cals*.3/9);c=Math.round(cals*.4/4);}
+  const opts=clientOptsHTML();
+  el.innerHTML=`<div class="calc-result">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div style="text-align:center"><div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--ac2)">${p}<span style="font-size:10px">g</span></div><div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">Proteína<br>${Math.round(p*4)} kcal</div></div>
+      <div style="text-align:center"><div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--yw)">${c}<span style="font-size:10px">g</span></div><div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">Carbos<br>${Math.round(c*4)} kcal</div></div>
+      <div style="text-align:center"><div style="font-family:var(--fd);font-size:20px;font-weight:800;color:var(--pu)">${f}<span style="font-size:10px">g</span></div><div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">Grasas<br>${Math.round(f*9)} kcal</div></div>
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:var(--t2);text-align:center">Total: ~${Math.round(p*4+c*4+f*9)} kcal · ${goal==='deficit'?'Perder grasa':goal==='volumen'?'Ganar músculo':'Mantenimiento'}</div>
+    ${opts?`<div style="margin-top:10px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);padding:10px">
+      <div style="font-size:10px;font-weight:600;color:var(--t2);letter-spacing:.3px;text-transform:uppercase;margin-bottom:7px">Guardar en perfil</div>
+      <div style="display:flex;gap:7px">
+        <select class="fs" id="calc-save-client-Macros" style="flex:1;font-size:11px;padding:7px">${opts}</select>
+        <button class="btn btn-p btn-sm" onclick="saveCalcResult('Macros','P:${p}g C:${c}g G:${f}g')">💾</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+
+let incomeChart=null;
+function renderIncomeChart(){
+  const canvas=document.getElementById('income-chart');if(!canvas)return;
+  if(incomeChart){incomeChart.destroy();incomeChart=null;}
+  const months=[];const values=[];const now=new Date();
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    months.push(d.toLocaleDateString('es-ES',{month:'short'}));
+    const total=DB.clients().reduce((s,c)=>s+getPayments(c.id).filter(p=>{const pd=new Date(p.date+'T12:00:00');return pd.getMonth()===d.getMonth()&&pd.getFullYear()===d.getFullYear();}).reduce((ss,p)=>ss+parseFloat(p.amount||0),0),0);
+    values.push(total);
+  }
+  const isLight=document.body.classList.contains('light');
+  incomeChart=new Chart(canvas,{
+    type:'bar',
+    data:{labels:months,datasets:[{data:values,backgroundColor:values.map((v,i)=>i===5?'rgba(200,255,87,.8)':'rgba(200,255,87,.25)'),borderRadius:6,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`$${fmtMoney(ctx.raw)}`},backgroundColor:'rgba(15,15,26,.95)',titleColor:'#c8ff57',bodyColor:'#eeeef8',borderColor:'#252535',borderWidth:1,cornerRadius:8}},scales:{x:{grid:{display:false},ticks:{color:'var(--t2)',font:{size:9}}},y:{grid:{color:isLight?'rgba(0,0,0,.05)':'rgba(255,255,255,.04)'},ticks:{color:'var(--t2)',font:{size:9},callback:v=>'$'+fmtMoney(v)}}}}
+  });
+}
+
+let agendaDate=new Date();
+function renderAgenda(){
+  const now=new Date();const week=[];
+  const start=new Date(now);start.setDate(now.getDate()-2);
+  for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);week.push(d);}
+  const weekEl=document.getElementById('agenda-week');
+  weekEl.innerHTML=week.map(d=>{
+    const isToday=d.toDateString()===now.toDateString();const isSelected=d.toDateString()===agendaDate.toDateString();const dayN=DAYS[d.getDay()];
+    return`<div onclick="selectAgendaDay(new Date('${d.toISOString()}'))" style="flex-shrink:0;width:48px;margin-right:6px;text-align:center;padding:8px 4px;border-radius:10px;cursor:pointer;transition:all .15s;background:${isSelected?'var(--ac)':isToday?'rgba(200,255,87,.1)':'var(--s2)'};border:1px solid ${isSelected?'var(--ac)':isToday?'rgba(200,255,87,.3)':'var(--bd)'};color:${isSelected?'#080810':'var(--tx)'}">
+      <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;opacity:.7">${dayN}</div>
+      <div style="font-family:var(--fd);font-size:18px;font-weight:800;margin:2px 0">${d.getDate()}</div>
+    </div>`;
+  }).join('');
+  const dayName=agendaDate.toDateString()===now.toDateString()?'Hoy':agendaDate.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('agenda-date-title').textContent=dayName;
+  const dow=agendaDate.getDay();const clients=DB.clients();
+  const training=clients.filter(c=>{const d=getDays(c.id);return d&&(d.days||[]).includes(dow);});
+  const el=document.getElementById('agenda-clients');
+  if(!training.length){el.innerHTML=`<div class="card"><div class="es"><div class="ei">🏖️</div><div class="et">Sin entrenos este día</div></div></div>`;return;}
+  el.innerHTML=`<div style="font-size:11px;color:var(--t2);margin-bottom:6px">${training.length} cliente${training.length>1?'s':''} entrenan hoy</div>`+
+  `<div class="card">`+training.map(c=>{
+    const days=getDays(c.id);const st=payStatus(getPayments(c.id));const pl=payLabel(st);
+    return`<div class="cc" onclick="openProfile('${c.id}')">
+      ${avatarHTML(c)}
+      <div class="ci"><div class="cn">${c.name}</div><div class="cm">${days?.time?'🕐 '+days.time:''} ${days?.duration?'· '+days.duration+' min':''}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        ${st!=='sin-registro'?`<span style="font-size:9px;padding:2px 6px;border-radius:4px;background:${pl.bg};color:${pl.color};font-weight:600">${pl.text}</span>`:''}
+        <button class="btn btn-s btn-sm" style="font-size:10px;padding:3px 8px" onclick="event.stopPropagation();openSessionSheetDirect('${c.id}','${agendaDate.toISOString().split('T')[0]}')">📝 Nota</button>
+      </div>
+    </div>`;
+  }).join('')+`</div>`;
+}
+function selectAgendaDay(d){agendaDate=new Date(d);renderAgenda();}
+function openSessionSheetDirect(id,date){
+  document.getElementById('sess-cid').value=id;document.getElementById('sess-date').value=date;
+  document.getElementById('sess-note').value='';document.getElementById('sess-type').value='Entrenamiento general';
+  document.getElementById('sess-mood').value='4';openSheet('session');
+}
+
+function globalSearch(){
+  const q=(document.getElementById('global-search')?.value||'').trim().toLowerCase();
+  const el=document.getElementById('search-results');
+  if(!q){el.innerHTML=`<div class="es"><div class="ei">🔍</div><div class="et">Escribe para buscar</div></div>`;return;}
+  const clients=DB.clients();let html='';
+  const matchClients=clients.filter(c=>c.name.toLowerCase().includes(q)||(c.goal||'').toLowerCase().includes(q)||(c.phone||'').includes(q)||(c.email||'').toLowerCase().includes(q));
+  if(matchClients.length){html+=`<div style="font-size:10px;font-weight:600;color:var(--t2);letter-spacing:.3px;text-transform:uppercase;margin-bottom:6px">Clientes (${matchClients.length})</div><div class="card" style="margin-bottom:12px">${matchClients.map(c=>clientRowHTML(c)).join('')}</div>`;}
+  const payMatches=[];
+  clients.forEach(c=>{getPayments(c.id).forEach(p=>{if((p.concept||'').toLowerCase().includes(q)||(p.method||'').toLowerCase().includes(q)||String(p.amount).includes(q))payMatches.push({c,p});});});
+  if(payMatches.length){html+=`<div style="font-size:10px;font-weight:600;color:var(--t2);letter-spacing:.3px;text-transform:uppercase;margin-bottom:6px">Pagos (${payMatches.length})</div><div class="card" style="margin-bottom:12px;padding:0 13px">${payMatches.slice(0,5).map(({c,p})=>`<div class="pi" onclick="openProfile('${c.id}')" style="cursor:pointer"><div style="flex:1"><div class="pa">$${fmtMoney(p.amount)}</div><div style="font-size:10px;color:var(--t2)">${c.name} · ${fmtDate(p.date)}${p.concept?' · '+p.concept:''}</div></div><span style="font-size:10px;color:var(--t2)">${p.method}</span></div>`).join('')}</div>`;}
+  if(!html)html=`<div class="es"><div class="ei">😶</div><div class="et">Sin resultados</div></div>`;
+  el.innerHTML=html;
+}
+
+function toggleFav(id){
+  const isFav=DB.get('fav_'+id);
+  if(isFav)DB.del('fav_'+id);else DB.set('fav_'+id,true);
+  const btn=document.getElementById('fav-btn-'+id);
+  if(btn){btn.style.color=!isFav?'#ffca28':'';btn.style.borderColor=!isFav?'rgba(255,202,40,.3)':'';}
+  showToast(isFav?'Quitado de favoritos':'⭐ Agregado a favoritos');renderClientList();
+}
+
+function openGoalsSheet(id){
+  document.getElementById('goals-cid').value=id;const goals=getGoals(id);
+  const container=document.getElementById('goal-rows');container.innerHTML='';
+  if(goals.length)goals.forEach(g=>addGoalRow(g));else addGoalRow();
+  openSheet('goals');
+}
+function addGoalRow(g=null){
+  const div=document.createElement('div');
+  div.style.cssText='background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:11px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px';
+  div.innerHTML=`
+    <div style="display:flex;gap:6px;align-items:center">
+      <input class="fi goal-name" placeholder="Meta: Ej. Llegar a 65kg..." style="font-size:12px;padding:8px;flex:1" value="${g?.name||''}">
+      <button onclick="this.closest('div').remove()" style="background:none;border:none;color:var(--rd);cursor:pointer;font-size:16px;flex-shrink:0">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div class="fg"><label class="fl">Fecha límite</label><input class="fi goal-date" type="date" value="${g?.date||''}" style="font-size:12px;padding:8px"></div>
+      <div class="fg"><label class="fl">Progreso %</label><input class="fi goal-pct" type="number" min="0" max="100" placeholder="0" value="${g?.pct||0}" style="font-size:12px;padding:8px" oninput="updateGoalBar(this)"></div>
+    </div>
+    <div style="background:var(--bd);border-radius:4px;height:6px;overflow:hidden"><div class="goal-bar" style="height:100%;width:${g?.pct||0}%;background:${(g?.pct||0)>=100?'var(--ac)':'linear-gradient(90deg,var(--ac2),var(--ac))'};transition:width .3s;border-radius:4px"></div></div>`;
+  document.getElementById('goal-rows').appendChild(div);
+}
+function updateGoalBar(input){
+  const pct=Math.min(100,Math.max(0,parseFloat(input.value)||0));
+  const bar=input.closest('div[style]').querySelector('.goal-bar');
+  if(bar){bar.style.width=pct+'%';bar.style.background=pct>=100?'var(--ac)':'linear-gradient(90deg,var(--ac2),var(--ac))';}
+}
+function saveGoals(){
+  const id=document.getElementById('goals-cid').value;
+  const rows=document.querySelectorAll('#goal-rows > div');
+  const goals=[...rows].map(r=>({id:uid(),name:r.querySelector('.goal-name')?.value||'',date:r.querySelector('.goal-date')?.value||'',pct:parseFloat(r.querySelector('.goal-pct')?.value||0)})).filter(g=>g.name);
+  DB.set('goals_'+id,goals);closeSheet('goals');showToast('✅ Metas guardadas');if(currentClientId===id)renderProfile(id);
+}
+function renderMetasTab(id){
+  const goals=getGoals(id);
+  return`<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="btn btn-p btn-sm" onclick="openGoalsSheet('${id}')">+ Agregar metas</button></div>`+
+  (!goals.length?`<div class="es"><div class="ei">🎯</div><div class="et">Sin metas</div></div>`:
+  goals.map(g=>{
+    const pct=Math.min(100,g.pct||0);const done=pct>=100;
+    return`<div class="pri" style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="font-weight:600;font-size:13px">${done?'✅ ':''}${g.name}</div>
+        <span style="font-family:var(--fd);font-size:16px;font-weight:800;color:${done?'var(--ac)':'var(--tx)'};flex-shrink:0">${pct}%</span>
+      </div>
+      ${g.date?`<div style="font-size:10px;color:var(--t2)">📅 Límite: ${fmtDate(g.date)}</div>`:''}
+      <div style="background:var(--bd);border-radius:4px;height:6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${done?'var(--ac)':'linear-gradient(90deg,var(--ac2),var(--ac))'};border-radius:4px"></div></div>
+    </div>`;
+  }).join(''));
+}
+
+function openSessionSheet(id){
+  document.getElementById('sess-cid').value=id;document.getElementById('sess-date').value=today();
+  document.getElementById('sess-note').value='';document.getElementById('sess-type').value='Entrenamiento general';
+  document.getElementById('sess-mood').value='4';openSheet('session');
+}
+function saveSession(){
+  const id=document.getElementById('sess-cid').value;const note=document.getElementById('sess-note').value.trim();
+  if(!note){showToast('⚠️ Escribe una nota');return;}
+  const entry={id:uid(),date:document.getElementById('sess-date').value,type:document.getElementById('sess-type').value,note,mood:document.getElementById('sess-mood').value,createdAt:new Date().toISOString()};
+  const arr=getSessions(id);arr.unshift(entry);DB.set('sessions_'+id,arr);
+  closeSheet('session');showToast('✅ Nota guardada');if(currentClientId===id)renderProfile(id);
+}
+function renderNotasTab(id){
+  const sessions=getSessions(id);const MOODS={5:'😄',4:'🙂',3:'😐',2:'😓',1:'😔'};
+  return`<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="btn btn-p btn-sm" onclick="openSessionSheet('${id}')">+ Nota de sesión</button></div>`+
+  (!sessions.length?`<div class="es"><div class="ei">📝</div><div class="et">Sin notas</div></div>`:
+  sessions.map(s=>`<div class="pri" style="margin-bottom:7px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:10px;color:var(--ac);font-weight:600;text-transform:uppercase;letter-spacing:.3px">${s.type}</div><div style="font-size:10px;color:var(--t2);margin-top:1px">${fmtDate(s.date)}</div></div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:20px">${MOODS[s.mood]||'🙂'}</span><button onclick="deleteSession('${id}','${s.id}')" style="background:none;border:none;color:var(--rd);cursor:pointer;font-size:13px">✕</button></div>
+    </div>
+    <div style="font-size:13px;line-height:1.55;color:var(--tx)">${s.note}</div>
+  </div>`).join(''));
+}
+async function deleteSession(cid,sid){
+  const ok=await showConfirm('¿Eliminar esta nota?','🗑️','Eliminar');if(!ok)return;
+  DB.set('sessions_'+cid,getSessions(cid).filter(x=>x.id!==sid));showToast('🗑️ Eliminada');renderProfile(cid);
+}
+
+const COMP_COLORS=['#c8ff57','#57c8ff','#ff5f57','#ffca28'];
+const METRIC_LABELS={weight:'Peso (kg)',fat:'Grasa (%)',waist:'Cintura (cm)',chest:'Pecho (cm)'};
+
+function renderCompChips(){
+  const chips=document.getElementById('comp-chips');if(!chips)return;
+  const clients=DB.clients();
+  if(!clients.length){chips.innerHTML=`<div style="font-size:12px;color:var(--t3)">Sin clientes registrados</div>`;return;}
+  chips.innerHTML=clients.map(c=>{
+    const sel=compClients.includes(c.id);
+    return`<div onclick="toggleCompClient('${c.id}')" id="cc-${c.id}"
+      style="display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:20px;cursor:pointer;
+      font-family:var(--fd);font-size:11px;font-weight:700;transition:all .15s;
+      background:${sel?'rgba(200,255,87,.1)':'var(--s2)'};
+      border:1px solid ${sel?'rgba(200,255,87,.3)':'var(--bd)'};
+      color:${sel?'var(--ac)':'var(--t2)'}">
+      ${avatarHTML(c,false).replace('class="av"','class="av" style="width:22px;height:22px;font-size:9px;border-radius:6px"')}
+      ${c.name.split(' ')[0]}
+    </div>`;
+  }).join('');
+}
+function toggleCompClient(id){
+  const i=compClients.indexOf(id);
+  if(i>-1){if(compClients.length>1)compClients.splice(i,1);}
+  else{if(compClients.length<4)compClients.push(id);}
+  renderCompChips();renderCompChart();renderCompTable();
+}
+function setCompMetric(btn,m){
+  document.querySelectorAll('#comp-metric-btns .cmbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');compMetric=m;renderCompChart();renderCompTable();
+}
+function renderCompChart(){
+  const ctx=document.getElementById('comp-chart');if(!ctx)return;
+  if(compChart){compChart.destroy();compChart=null;}
+  const clients=DB.clients();
+  const datasets=compClients.map((id,i)=>{
+    const c=clients.find(x=>x.id===id);if(!c)return null;
+    const prog=[...getProgress(id)].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const vals=prog.map(p=>parseFloat(p[compMetric]||0)).filter((_,j)=>prog[j][compMetric]);
+    if(!vals.length)return null;
+    return{label:c.name.split(' ')[0],data:vals,borderColor:COMP_COLORS[i],backgroundColor:COMP_COLORS[i]+'22',borderWidth:2,tension:.4,fill:false,pointRadius:3,pointHoverRadius:5};
+  }).filter(Boolean);
+  if(!datasets.length){ctx.parentElement.innerHTML='<div style="text-align:center;padding:40px;color:var(--t3);font-size:12px">Los clientes seleccionados no tienen datos registrados</div>';return;}
+  const maxLen=Math.max(...datasets.map(d=>d.data.length));
+  const labels=Array.from({length:maxLen},(_,i)=>'Sem '+(i+1));
+  compChart=new Chart(ctx,{
+    type:'line',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8080a0',font:{family:'Syne',weight:'700',size:10},boxWidth:10,padding:10}}},scales:{x:{ticks:{color:'var(--t2)',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'var(--t2)',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}
+  });
+}
+function renderCompTable(){
+  const wrap=document.getElementById('comp-table-wrap');if(!wrap)return;
+  const clients=DB.clients();
+  if(!compClients.length){wrap.innerHTML='<div class="es"><div class="ei">👥</div><div class="et">Selecciona clientes arriba</div></div>';return;}
+  const rows=compClients.map(id=>{
+    const c=clients.find(x=>x.id===id);if(!c)return'';
+    const prog=[...getProgress(id)].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const vals=prog.map(p=>parseFloat(p[compMetric])).filter(v=>!isNaN(v)&&v>0);
+    if(!vals.length)return`<div class="cc">${avatarHTML(c)}<div class="ci"><div class="cn">${c.name}</div><div class="cm">Sin datos de ${METRIC_LABELS[compMetric]}</div></div></div>`;
+    const ini=vals[0],cur=vals[vals.length-1],diff=(cur-ini).toFixed(1);
+    const pct=((cur-ini)/ini*100).toFixed(1);const good=parseFloat(diff)<0;const sign=parseFloat(diff)>0?'+':'';
+    const unit=METRIC_LABELS[compMetric].match(/\((.+)\)/)?.[1]||'';
+    return`<div class="cc">
+      ${avatarHTML(c)}
+      <div class="ci"><div class="cn">${c.name}</div><div class="cm">${ini}${unit} → ${cur}${unit}</div></div>
+      <div style="text-align:right">
+        <div style="font-family:var(--fd);font-size:14px;font-weight:800;color:${good?'var(--ac)':'var(--rd)'}">${sign}${diff}</div>
+        <div style="font-size:9px;color:var(--t2)">${sign}${pct}%</div>
+      </div>
+      <span class="badge ${good?'badge-ac':'badge-rd'}">${good?'↓':'↑'}</span>
+    </div>`;
+  }).join('<div class="divider"></div>');
+  wrap.innerHTML=rows||`<div class="es"><div class="ei">📊</div><div class="et">Sin datos</div></div>`;
+}
+
+function renderTemplateList(){
+  const list=document.getElementById('templates-list');if(!list)return;
+  const tpls=getTemplates();
+  if(!tpls.length){list.innerHTML=`<div class="es"><div class="ei">📋</div><div class="et">Sin plantillas</div><div class="esub">Crea tu primera plantilla</div></div>`;return;}
+  list.innerHTML=tpls.map(t=>`
+    <div class="cc">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(200,255,87,.1);border:1px solid rgba(200,255,87,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏋️</div>
+      <div class="ci">
+        <div class="cn">${t.name}</div>
+        <div class="cm">${[t.days,t.duration,(t.types||[]).join(', ')].filter(Boolean).join(' · ')}</div>
+        ${t.desc?`<div style="font-size:10px;color:var(--t3);margin-top:2px">${t.desc}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
+        <button class="btn btn-s btn-sm" style="font-size:10px" onclick="assignTemplateToClient('${t.id}')">Asignar</button>
+        <button class="btn btn-d btn-sm" style="font-size:10px" onclick="deleteTemplate('${t.id}')">✕</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+  `).join('');
+}
+function openNewTemplate(){
+  document.getElementById('tpl-name').value='';document.getElementById('tpl-desc').value='';
+  document.querySelectorAll('#tpl-types .chip').forEach(c=>c.classList.remove('on'));
+  openSheet('template');
+}
+function saveTemplate(){
+  const name=document.getElementById('tpl-name').value.trim();
+  if(!name){showToast('⚠️ El nombre es obligatorio');return;}
+  const types=[...document.querySelectorAll('#tpl-types .chip.on')].map(c=>c.textContent);
+  const t={id:uid(),name,days:document.getElementById('tpl-days').value,duration:document.getElementById('tpl-dur').value,types,desc:document.getElementById('tpl-desc').value,created:today()};
+  const tpls=getTemplates();tpls.unshift(t);saveTemplates(tpls);
+  closeSheet('template');renderTemplateList();showToast('✅ Plantilla guardada');
+}
+async function deleteTemplate(id){
+  const ok=await showConfirm('¿Eliminar plantilla?','🗑️','Eliminar');if(!ok)return;
+  saveTemplates(getTemplates().filter(t=>t.id!==id));renderTemplateList();showToast('🗑️ Eliminada');
+}
+function assignTemplateToClient(tplId){
+  const tpl=getTemplates().find(t=>t.id===tplId);if(!tpl)return;
+  const clients=DB.clients();
+  if(!clients.length){showToast('No hay clientes registrados');return;}
+  showToast(`💡 Abre el perfil del cliente → Rutina para asignar`);
+}
+
+function exportClientPDF(id){
+  const c=DB.clients().find(x=>x.id===id);if(!c){showToast('Cliente no encontrado');return;}
+  const pays=getPayments(id);const prog=[...getProgress(id)].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const routs=getRoutines(id);const totalPaid=pays.reduce((s,p)=>s+Number(p.amount||0),0);
+  const lastPay=pays.length?[...pays].sort((a,b)=>new Date(b.date)-new Date(a.date))[0]:null;
+  const diffStr=key=>{
+    if(prog.length<2)return'Sin suficientes datos';
+    const ini=parseFloat(prog[0][key]),cur=parseFloat(prog[prog.length-1][key]);
+    if(isNaN(ini)||isNaN(cur))return'Sin datos';
+    const d=(cur-ini).toFixed(1);return`${ini} → ${cur} (${d>0?'+':''}${d})`;
+  };
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Reporte — ${c.name}</title>
+  <style>body{font-family:Arial,sans-serif;margin:0;padding:32px;color:#111;font-size:13px}h1{font-size:22px;font-weight:900;margin-bottom:4px}
+  .sub{color:#666;font-size:11px;margin-bottom:24px}h2{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#333;margin:20px 0 8px;border-bottom:2px solid #c8ff57;padding-bottom:4px}
+  .row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0}.label{color:#555}.value{font-weight:600}
+  table{width:100%;border-collapse:collapse;margin-top:6px}th{text-align:left;font-size:10px;color:#666;letter-spacing:1px;text-transform:uppercase;padding:6px 8px;border-bottom:2px solid #eee}
+  td{padding:7px 8px;border-bottom:1px solid #f5f5f5;font-size:12px}.footer{margin-top:40px;text-align:center;color:#aaa;font-size:10px;border-top:1px solid #eee;padding-top:16px}
+  </style></head><body>
+  <h1>💪 Abreu Manager</h1>
+  <div class="sub">Reporte generado el ${new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'})}</div>
+  <h2>Datos del cliente</h2>
+  <div class="row"><span class="label">Nombre</span><span class="value">${c.name}</span></div>
+  ${c.age?`<div class="row"><span class="label">Edad</span><span class="value">${c.age} años</span></div>`:''}
+  ${c.gender?`<div class="row"><span class="label">Género</span><span class="value">${c.gender}</span></div>`:''}
+  ${c.goal?`<div class="row"><span class="label">Objetivo</span><span class="value">${c.goal}</span></div>`:''}
+  <div class="row"><span class="label">Estado</span><span class="value">${c.status||'Activo'}</span></div>
+  ${c.phone?`<div class="row"><span class="label">Teléfono</span><span class="value">${c.phone}</span></div>`:''}
+  ${prog.length>=2?`<h2>Progreso físico (${prog.length} registros)</h2>
+  <div class="row"><span class="label">Peso</span><span class="value">${diffStr('weight')} kg</span></div>
+  <div class="row"><span class="label">Grasa corporal</span><span class="value">${diffStr('fat')} %</span></div>
+  <div class="row"><span class="label">Cintura</span><span class="value">${diffStr('waist')} cm</span></div>`:''}
+  ${pays.length?`<h2>Historial de pagos</h2>
+  <table><thead><tr><th>Fecha</th><th>Monto</th><th>Método</th><th>Concepto</th></tr></thead><tbody>
+  ${[...pays].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(p=>`<tr><td>${fmtDate(p.date)}</td><td><strong>$${fmtMoney(p.amount)}</strong></td><td>${p.method||'—'}</td><td>${p.concept||'—'}</td></tr>`).join('')}
+  </tbody></table>
+  <div class="row" style="margin-top:10px"><span class="label"><strong>Total cobrado</strong></span><span class="value" style="font-size:16px">$${fmtMoney(totalPaid)}</span></div>`:''}
+  ${routs.length?`<h2>Rutinas (${routs.length})</h2>${routs.map(r=>`<div class="row"><span class="label">${r.name}</span><span class="value">${r.days||'—'} · ${r.duration||''}</span></div>`).join('')}`:''}
+  ${c.notes?`<h2>Notas médicas</h2><p style="color:#555;line-height:1.6">${c.notes}</p>`:''}
+  <div class="footer">Abreu Manager v3.1 · Generado automáticamente · Uso confidencial</div>
+  </body></html>`;
+  const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`Reporte_${c.name.replace(/\s+/g,'_')}_${today()}.html`;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},500);
+  showToast('📄 Reporte descargado — ábrelo y usa Ctrl+P para PDF');
+}
+
+function haptic(t=30){try{if(navigator.vibrate)navigator.vibrate(t);}catch{}}
+function exportData(){
+  const clients=DB.clients();
+  const data={clients,version:'3.1',exported:new Date().toISOString()};
+  clients.forEach(c=>{['payments','progress','routines','meals','days','photos','sessions','goals','calc_results'].forEach(k=>{const v=DB.get(k+'_'+c.id);if(v)data[k+'_'+c.id]=v;});if(DB.get('fav_'+c.id))data['fav_'+c.id]=true;});
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`abreu-manager-${today()}.json`;a.click();
+  showToast('✅ Datos exportados');
+}
+async function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=async ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.clients){showToast('⚠️ Archivo inválido');return;}
+      const ok=await showConfirm(`¿Importar ${data.clients.length} clientes?`,'📥','Importar');if(!ok)return;
+      DB.save(data.clients);
+      data.clients.forEach(c=>{['payments','progress','routines','meals','days','photos','sessions','goals','calc_results'].forEach(k=>{if(data[k+'_'+c.id])DB.set(k+'_'+c.id,data[k+'_'+c.id]);});if(data['fav_'+c.id])DB.set('fav_'+c.id,true);});
+      renderAll();showToast('✅ Importado');
+    }catch{showToast('⚠️ Archivo inválido');}
+  };
+  r.readAsText(file);e.target.value='';
+}
+async function clearAll(){
+  const ok=await showConfirm('¿Borrar TODOS los datos?','⚠️','Borrar todo');if(!ok)return;
+  DB.clients().forEach(c=>{['payments','progress','routines','meals','days','photos','sessions','goals','calc_results'].forEach(k=>DB.del(k+'_'+c.id));DB.del('fav_'+c.id);});
+  DB.save([]);renderAll();showToast('🗑️ Datos eliminados');
+}
+</script>
+</body>
+</html>
