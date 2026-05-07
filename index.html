@@ -2033,7 +2033,47 @@ async function clearAll(){
   const ok=await showConfirm('¿Borrar TODOS los datos?','⚠️','Borrar todo');if(!ok)return;
   DB.clients().forEach(c=>{['payments','progress','routines','meals','days','photos','sessions','goals','calc_results'].forEach(k=>DB.del(k+'_'+c.id));DB.del('fav_'+c.id);});
   DB.save([]);renderAll();showToast('🗑️ Datos eliminados');
+
+  <script type="module">
+
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabaseUrl = 'https://hejqvftaygsjgabvpyak.supabase.co'
+
+const supabaseKey = 'sb_publishable_GxuSTw9FN7tE-nwu8U-YYg_OppomMnb'
+
+const supabase = createClient(
+  supabaseUrl,
+  supabaseKey
+)
+
+window.guardarCliente = async function () {
+
+  const nombre = document.getElementById('nombre')?.value || ''
+  const telefono = document.getElementById('telefono')?.value || ''
+  const peso = document.getElementById('peso')?.value || ''
+  const altura = document.getElementById('altura')?.value || ''
+
+  const { data, error } = await supabase
+    .from('clientes')
+    .insert([
+      {
+        nombre,
+        telefono,
+        peso,
+        altura
+      }
+    ])
+
+  if (error) {
+    console.log(error)
+    alert('Error guardando cliente')
+  } else {
+    console.log(data)
+    alert('Cliente guardado correctamente')
+  }
 }
+
 </script>
 </body>
 </html>
