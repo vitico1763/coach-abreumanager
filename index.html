@@ -338,6 +338,7 @@ body.fab-open-state #fab-tab::after {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     </button>
     <button class="btn btn-s btn-sm btn-ico" onclick="toggleTheme()" id="theme-btn" title="Modo claro/oscuro">🌙</button>
+    <button id="sync-btn" onclick="syncNow()" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);color:var(--pu);border-radius:var(--r3);padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--fb)">&#x2601;&#xFE0F; Sync</button>
     <button class="btn btn-s btn-sm btn-ico" onclick="openAddClient()">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
     </button>
@@ -1479,6 +1480,7 @@ function renderProfile(id){
       <button class="btn btn-s btn-sm" onclick="exportClientPDF('${id}')">📄 PDF</button>
       <button class="btn btn-s btn-sm" onclick="toggleFav('${id}')" id="fav-btn-${id}" style="${DB.get('fav_'+id)?'color:#ffca28;border-color:rgba(255,202,40,.3)':''}">⭐</button>
       <button class="btn btn-d btn-sm" onclick="deleteClient('${id}')">🗑️</button>
+      <button class="btn btn-sm" style="background:rgba(87,200,255,.1);color:var(--ac2);border:1px solid rgba(87,200,255,.25)" onclick="openShareLink('${id}')">&#x1F517; Compartir</button>
     </div>
     ${(c.phone||c.email||days?.days?.length||c.notes)?`
     <div class="card" style="padding:11px 13px;display:flex;flex-direction:column;gap:7px">
@@ -2647,6 +2649,108 @@ async function clearAll(){
   const ok=await showConfirm('¿Borrar TODOS los datos?','⚠️','Borrar todo');if(!ok)return;
   DB.clients().forEach(c=>{['payments','progress','routines','meals','days','photos','sessions','goals','calc_results'].forEach(k=>DB.del(k+'_'+c.id));DB.del('fav_'+c.id);});
   DB.save([]);renderAll();showToast('🗑️ Datos eliminados');
+}
+</script>
+
+<!-- SHARE MODAL -->
+<div class="cov" id="cov-share">
+  <div class="cdlg">
+    <div style="padding:20px">
+      <div style="font-size:36px;text-align:center;margin-bottom:8px">&#x1F517;</div>
+      <div style="font-family:var(--fd);font-size:15px;font-weight:700;margin-bottom:4px;text-align:center">Link del cliente</div>
+      <div style="font-size:11px;color:var(--t2);text-align:center;margin-bottom:12px">El cliente puede ver su perfil desde su celular</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);padding:10px 12px;display:flex;align-items:center;gap:8px">
+        <div id="share-url-text" style="flex:1;font-size:11px;color:var(--ac2);word-break:break-all;line-height:1.4">—</div>
+        <button onclick="copyShareLink()" style="background:var(--ac);border:none;border-radius:8px;color:#080810;font-weight:700;font-size:11px;padding:6px 10px;cursor:pointer;flex-shrink:0">Copiar</button>
+      </div>
+      <div id="share-sync-note" style="font-size:10px;color:var(--t3);margin-top:8px;text-align:center">&#x26A0;&#xFE0F; Sincroniza primero para que el cliente vea datos actualizados</div>
+    </div>
+    <div style="border-top:1px solid var(--bd)">
+      <button onclick="document.getElementById('cov-share').classList.remove('open');document.body.style.overflow=''" style="width:100%;padding:14px;background:none;border:none;color:var(--t2);font-family:var(--fb);font-size:13px;font-weight:600;cursor:pointer">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const JSONBIN_KEY='$2a$10$n7hpnA2RmtiGGjG11Mvgnum18M7O417b7sZ5yPt14MIsCJ.BTgtwi';
+const JSONBIN_BASE='https://api.jsonbin.io/v3';
+
+function setSyncBtn(state){
+  const btn=document.getElementById('sync-btn');if(!btn)return;
+  if(state==='syncing'){btn.textContent='Sync...';btn.style.opacity='.5';}
+  else if(state==='ok'){btn.textContent='Sync OK';btn.style.color='var(--ac)';btn.style.borderColor='rgba(200,255,87,.3)';btn.style.background='rgba(200,255,87,.1)';btn.style.opacity='1';setTimeout(()=>{btn.textContent='Sync';btn.style.color='var(--pu)';btn.style.borderColor='rgba(167,139,250,.25)';btn.style.background='rgba(167,139,250,.1)';},3000);}
+  else if(state==='err'){btn.textContent='Error';btn.style.color='var(--rd)';btn.style.opacity='1';setTimeout(()=>{btn.textContent='Sync';btn.style.color='var(--pu)';},3000);}
+}
+
+function buildPayload(){
+  const clients=DB.clients();
+  const payload={clients,version:'3.1',syncedAt:new Date().toISOString()};
+  clients.forEach(c=>{
+    ['payments','progress','routines','meals','days','photos','sessions','goals','calc_results'].forEach(k=>{const v=DB.get(k+'_'+c.id);if(v)payload[k+'_'+c.id]=v;});
+    if(DB.get('fav_'+c.id))payload['fav_'+c.id]=true;
+  });
+  return payload;
+}
+
+async function syncNow(){
+  if(!navigator.onLine){showToast('Sin internet');return;}
+  setSyncBtn('syncing');
+  try{
+    const data=buildPayload();
+    let binId=DB.get('jsonbin_id');
+    let res;
+    if(binId){
+      res=await fetch(JSONBIN_BASE+'/b/'+binId,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY,'X-Bin-Versioning':'false'},body:JSON.stringify(data)});
+    } else {
+      res=await fetch(JSONBIN_BASE+'/b',{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY,'X-Bin-Name':'AbreuManager','X-Bin-Private':'false'},body:JSON.stringify(data)});
+      if(res.ok){
+        const json=await res.json();
+        binId=json&&json.metadata&&json.metadata.id;
+        if(!binId&&json){const t=JSON.stringify(json);const m=t.match(/"id":"([a-f0-9]+)"/);if(m)binId=m[1];}
+        if(binId)DB.set('jsonbin_id',binId);
+      }
+    }
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    setSyncBtn('ok');
+    showToast('Sincronizado correctamente');
+  }catch(e){
+    setSyncBtn('err');
+    showToast('Error: '+e.message);
+  }
+}
+
+let _shareClientId=null;
+function openShareLink(clientId){
+  _shareClientId=clientId;
+  const binId=DB.get('jsonbin_id');
+  const noteEl=document.getElementById('share-sync-note');
+  const urlEl=document.getElementById('share-url-text');
+  if(binId){
+    const base=window.location.href.replace(/[^\/]*$|index\.html$/,'');
+    const url=base+'client-view.html?bin='+binId+'&id='+clientId;
+    urlEl.textContent=url;
+    if(noteEl)noteEl.style.display='none';
+  } else {
+    urlEl.textContent='Primero toca Sync para generar el link';
+    if(noteEl)noteEl.style.display='block';
+  }
+  document.getElementById('cov-share').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function copyShareLink(){
+  const binId=DB.get('jsonbin_id');
+  if(!binId){showToast('Sincroniza primero');return;}
+  const base=window.location.href.replace(/[^\/]*$|index\.html$/,'');
+  const url=base+'client-view.html?bin='+binId+'&id='+_shareClientId;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>showToast('Link copiado')).catch(()=>fallbackCopy(url));
+  } else {
+    fallbackCopy(url);
+  }
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');showToast('Link copiado');}catch{showToast('Copia el link manualmente');}document.body.removeChild(ta);
 }
 </script>
 </body>
