@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#080810">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Mi Perfil — Abreu Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#080810;--s1:#0f0f1a;--s2:#171724;--s3:#1e1e2e;--bd:#252535;--bd2:#2e2e42;
+  --ac:#c8ff57;--ac2:#57c8ff;--rd:#ff5f57;--yw:#ffca28;--pu:#a78bfa;
+  --tx:#eeeef8;--t2:#8080a0;--t3:#404060;
+  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
+  --r:14px;--r2:10px;--r3:8px;
+  --sb:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);overscroll-behavior:none;-webkit-font-smoothing:antialiased}
+body{color:var(--tx);font-family:var(--fb);font-size:14px}
+#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(8,8,16,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ac);letter-spacing:-.5px}
+.logo span{color:var(--tx)}
+.ro-badge{font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(87,200,255,.1);color:var(--ac2);border:1px solid rgba(87,200,255,.2);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.content{padding:14px 13px;padding-bottom:calc(40px + var(--sb));display:flex;flex-direction:column;gap:12px}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.ph{background:linear-gradient(145deg,var(--s2),var(--s1));border:1px solid var(--bd);border-radius:var(--r);padding:15px;display:flex;align-items:flex-start;gap:13px;position:relative;overflow:hidden}
+.ph::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(200,255,87,.08),transparent 70%);pointer-events:none}
+.av{width:44px;height:44px;border-radius:12px;background:var(--s2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:14px;color:var(--ac);border:1px solid var(--bd)}
+.av-lg{width:64px;height:64px;border-radius:15px;font-size:21px}
+.av img,.av-lg img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.badge{font-size:9px;padding:2px 7px;border-radius:5px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
+.badge-ac{background:rgba(200,255,87,.12);color:var(--ac)}
+.badge-rd{background:rgba(255,95,87,.12);color:var(--rd)}
+.badge-yw{background:rgba(255,202,40,.12);color:var(--yw)}
+.pstats{display:flex;gap:13px;margin-top:8px;flex-wrap:wrap}
+.pstat strong{font-family:var(--fd);font-size:13px;font-weight:800;display:block}
+.pstat span{color:var(--t2);font-size:10px;text-transform:uppercase;letter-spacing:.3px}
+.tabs{display:flex;background:var(--s2);border-radius:var(--r2);padding:3px;gap:2px;overflow-x:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:60px;text-align:center;padding:6px 4px;border-radius:var(--r3);cursor:pointer;font-size:10px;font-weight:600;color:var(--t2);transition:all .16s;border:none;background:none;font-family:var(--fb);letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
+.tab.active{background:var(--s1);color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.pri{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r2);padding:11px 13px;display:flex;flex-direction:column;gap:7px;margin-bottom:7px}
+.chart-wrap{position:relative;height:160px;width:100%}
+.chart-metric-btns{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.cmbtn{padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;background:var(--s2);color:var(--t2);border:1px solid var(--bd);cursor:pointer;transition:all .14s;letter-spacing:.3px;text-transform:uppercase}
+.cmbtn.active{background:rgba(200,255,87,.12);color:var(--ac);border-color:rgba(200,255,87,.3)}
+.photo-compare{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.photo-slot{aspect-ratio:3/4;background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;overflow:hidden;position:relative}
+.photo-slot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.photo-slot-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:8px 6px 6px;font-size:10px;font-weight:600;color:#fff;text-align:center;letter-spacing:.3px;text-transform:uppercase}
+.es{text-align:center;padding:36px 20px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.ei{font-size:38px;opacity:.35}
+.et{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--t2)}
+.esub{font-size:11px;color:var(--t3)}
+.pi{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.pi:last-child{border-bottom:none}
+.pa{font-family:var(--fd);font-size:16px;font-weight:800;color:var(--ac)}
+.readonly-notice{display:flex;align-items:center;gap:8px;background:rgba(87,200,255,.06);border:1px solid rgba(87,200,255,.15);border-radius:var(--r2);padding:9px 12px;font-size:11px;color:var(--ac2)}
+.info-row{display:flex;gap:8px;align-items:center;font-size:12px;padding:6px 0;border-bottom:1px solid var(--bd)}
+.info-row:last-child{border-bottom:none}
+.footer{text-align:center;padding:20px;font-size:10px;color:var(--t3)}
+.footer span{color:var(--ac)}
+#loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:16px;padding:40px 24px;text-align:center}
+.load-icon{font-size:48px;animation:bounce 1s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.load-title{font-family:var(--fd);font-size:16px;font-weight:700}
+.load-sub{font-size:11px;color:var(--t3)}
+#not-found{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:16px;padding:40px 24px;text-align:center}
+.nf-icon{font-size:64px;opacity:.25}
+.nf-title{font-family:var(--fd);font-size:20px;font-weight:800;color:var(--t2)}
+.nf-sub{font-size:12px;color:var(--t3);line-height:1.6;max-width:260px}
+#main-content{display:none}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.fadein{animation:fi .3s ease}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="logo">Abreu<span>Manager</span></div>
+    <span class="ro-badge">👁 Solo lectura</span>
+  </div>
+
+  <div id="loading">
+    <div class="load-icon">☁️</div>
+    <div class="load-title">Cargando tu perfil...</div>
+    <div class="load-sub">Obteniendo datos desde la nube</div>
+  </div>
+
+  <div id="not-found">
+    <div class="nf-icon">🔍</div>
+    <div class="nf-title">Perfil no encontrado</div>
+    <div class="nf-sub">El enlace puede estar desactualizado. Pide a tu entrenador que lo comparta nuevamente.</div>
+  </div>
+
+  <div class="content fadein" id="main-content">
+    <div class="readonly-notice">🔒 Vista de solo lectura — Tu entrenador comparte tu progreso contigo</div>
+    <div class="ph" id="profile-header"></div>
+    <div class="card" id="info-card" style="padding:11px 13px;display:none;flex-direction:column;gap:0"></div>
+    <div class="tabs" id="tabs-bar">
+      <button class="tab active" onclick="switchTab('progreso',this)">📊 Progreso</button>
+      <button class="tab" onclick="switchTab('fotos',this)">📸 Fotos</button>
+      <button class="tab" onclick="switchTab('rutinas',this)">🏋️ Rutinas</button>
+      <button class="tab" onclick="switchTab('dieta',this)">🥗 Dieta</button>
+      <button class="tab" onclick="switchTab('pagos',this)">💰 Pagos</button>
+      <button class="tab" onclick="switchTab('metas',this)">🎯 Metas</button>
+    </div>
+    <div id="tab-content"></div>
+    <div class="footer">Powered by <span>Abreu Manager</span></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const JSONBIN_KEY='$2a$10$n7hpnA2RmtiGGjG11Mvgnum18M7O417b7sZ5yPt14MIsCJ.BTgtwi';
+const JSONBIN_BASE='https://api.jsonbin.io/v3';
+const fmtDate=s=>{if(!s)return'';const d=new Date(s+'T12:00:00');return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'});};
+const fmtMoney=n=>Number(n||0).toLocaleString('es');
+const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const initials=n=>n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+function payStatus(pays){if(!pays||!pays.length)return'sin-registro';const last=[...pays].sort((a,b)=>new Date(b.date)-new Date(a.date))[0];if(!last.nextDate)return'sin-registro';const diff=Math.ceil((new Date(last.nextDate+'T12:00:00')-new Date())/86400000);return diff<0?'vencido':diff<=3?'pronto':'al-dia';}
+function payLabel(s){if(s==='vencido')return{text:'🔴 Vencido',color:'#ff5f57',bg:'rgba(255,95,87,.12)'};if(s==='pronto')return{text:'🟡 Vence pronto',color:'#ffca28',bg:'rgba(255,202,40,.12)'};if(s==='al-dia')return{text:'🟢 Al día',color:'#c8ff57',bg:'rgba(200,255,87,.12)'};return{text:'⚪ Sin registro',color:'#8080a0',bg:'rgba(128,128,160,.1)'};}
+function statusLabel(s){if(s==='pausado')return{text:'Pausado',cls:'badge-yw'};if(s==='inactivo')return{text:'Inactivo',cls:'badge-rd'};return{text:'Activo',cls:'badge-ac'};}
+function avatarHTML(c,lg){const cls='av'+(lg?' av-lg':'');if(c.photo)return`<div class="${cls}"><img src="${c.photo}" alt=""></div>`;return`<div class="${cls}">${initials(c.name)}</div>`;}
+
+let cloudData=null,clientId=null,clientData=null,currentTab='progreso',currentChartMetric='weight',chartInstance=null;
+
+const getPayments=id=>cloudData['payments_'+id]||[];
+const getProgress=id=>cloudData['progress_'+id]||[];
+const getRoutines=id=>cloudData['routines_'+id]||[];
+const getMeals=id=>cloudData['meals_'+id]||[];
+const getDays=id=>cloudData['days_'+id]||null;
+const getPhotos=id=>cloudData['photos_'+id]||{before:null,after:null};
+const getGoals=id=>cloudData['goals_'+id]||[];
+const getCalcResults=id=>cloudData['calc_results_'+id]||[];
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  const params=new URLSearchParams(window.location.search);
+  const binId=params.get('bin');
+  clientId=params.get('id');
+  if(!binId||!clientId){showNotFound('Faltan parámetros en el link');return;}
+  try{
+    const res=await fetch('https://api.jsonbin.io/v3/b/'+binId+'/latest',{headers:{'X-Master-Key':JSONBIN_KEY}});
+    const text=await res.text();
+    if(!res.ok){showNotFound('Error '+res.status+': '+text.slice(0,80));return;}
+    let json;
+    try{json=JSON.parse(text);}catch(e){showNotFound('Respuesta inválida: '+text.slice(0,80));return;}
+    // JSONBin wraps data in json.record
+    cloudData=json.record||json;
+    if(!cloudData||!cloudData.clients){showNotFound('No hay datos en la nube. Haz Sync primero.');return;}
+    const clients=cloudData.clients||[];
+    clientData=clients.find(c=>c.id===clientId);
+    if(!clientData){showNotFound('Cliente no encontrado. ID: '+clientId);return;}
+    renderPage();
+  }catch(e){showNotFound('Error: '+e.message);}
+});
+
+function showNotFound(reason){
+  document.getElementById('loading').style.display='none';
+  const nf=document.getElementById('not-found');
+  nf.style.display='flex';
+  if(reason){
+    const sub=nf.querySelector('.nf-sub');
+    if(sub)sub.textContent=reason;
+  }
+}
+
+function renderPage(){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('main-content').style.display='flex';
+  const c=clientData;
+  const pays=getPayments(c.id);
+  const progress=getProgress(c.id);
+  const latest=progress.length?[...progress].sort((a,b)=>new Date(b.date)-new Date(a.date))[0]:null;
+  const bmi=c.weight&&c.height?(parseFloat(c.weight)/Math.pow(parseFloat(c.height)/100,2)).toFixed(1):null;
+  const st=payStatus(pays);const pl=payLabel(st);const sl=statusLabel(c.status||'activo');
+  const days=getDays(c.id);
+  document.getElementById('profile-header').innerHTML=`
+    ${avatarHTML(c,true)}
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800">${c.name}</div>
+        <span class="badge ${sl.cls}">${sl.text}</span>
+      </div>
+      <div style="color:var(--t2);font-size:11px;margin-top:2px">${c.goal||'Sin objetivo'}</div>
+      <div style="margin-top:6px"><span style="font-size:9px;padding:2px 8px;border-radius:5px;background:${pl.bg};color:${pl.color};font-weight:600">${pl.text}</span></div>
+      <div class="pstats">
+        ${c.age?`<div class="pstat"><strong>${c.age}</strong><span>Edad</span></div>`:''}
+        ${(latest?.weight||c.weight)?`<div class="pstat"><strong>${latest?.weight||c.weight}<span style="font-size:9px">kg</span></strong><span>Peso</span></div>`:''}
+        ${c.height?`<div class="pstat"><strong>${c.height}<span style="font-size:9px">cm</span></strong><span>Altura</span></div>`:''}
+        ${bmi?`<div class="pstat"><strong>${bmi}</strong><span>IMC</span></div>`:''}
+      </div>
+    </div>`;
+  const infoEl=document.getElementById('info-card');
+  const rows=[];
+  if(days?.days?.length)rows.push(`<div class="info-row"><span>📅</span><span style="color:var(--t2)">${days.days.sort((a,b)=>a-b).map(d=>DAYS[d]).join(', ')}${days.time?' · '+days.time:''}${days.duration?' · '+days.duration+' min':''}</span></div>`);
+  if(c.notes)rows.push(`<div class="info-row"><span>📝</span><span style="color:var(--t2)">${c.notes}</span></div>`);
+  if(rows.length){infoEl.innerHTML=rows.join('');infoEl.style.display='flex';}
+  renderTab('progreso');
+}
+
+function switchTab(tab,btn){
+  currentTab=tab;
+  document.querySelectorAll('#tabs-bar .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderTab(tab);
+}
+
+function renderTab(tab){
+  const el=document.getElementById('tab-content');
+  if(tab==='progreso'){el.innerHTML=renderProgresoTab();setTimeout(()=>initChart(),60);}
+  else if(tab==='fotos')el.innerHTML=renderFotosTab();
+  else if(tab==='rutinas')el.innerHTML=renderRutinasTab();
+  else if(tab==='dieta')el.innerHTML=renderDietaTab();
+  else if(tab==='pagos')el.innerHTML=renderPagosTab();
+  else if(tab==='metas')el.innerHTML=renderMetasTab();
+}
+
+function renderProgresoTab(){
+  const progress=[...getProgress(clientId)].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const metrics=[{k:'weight',l:'Peso'},{k:'fat',l:'Grasa'},{k:'waist',l:'Cintura'},{k:'abdomen',l:'Abdomen'},{k:'chest',l:'Pecho'},{k:'hip',l:'Cadera'},{k:'glute',l:'Glúteo'},{k:'thigh',l:'Muslo'},{k:'calf',l:'Pantorrilla'},{k:'arm',l:'Brazo'}];
+  let html=`<div class="card" style="padding:13px;margin-bottom:8px">
+    <div style="font-size:11px;font-weight:600;color:var(--t2);letter-spacing:.3px;text-transform:uppercase;margin-bottom:8px">Gráfica de progreso</div>
+    <div class="chart-metric-btns">${metrics.map(m=>`<button class="cmbtn${m.k===currentChartMetric?' active':''}" onclick="changeChartMetric('${m.k}',this)">${m.l}</button>`).join('')}</div>
+    <div class="chart-wrap"><canvas id="progress-chart"></canvas></div>
+  </div>`;
+  const calcResults=getCalcResults(clientId);
+  if(calcResults.length){html+=`<div class="card" style="padding:13px;margin-bottom:8px"><div style="font-size:11px;font-weight:600;color:var(--t2);letter-spacing:.3px;text-transform:uppercase;margin-bottom:10px">📐 Resultados calculadoras</div>${calcResults.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd)"><div><div style="font-weight:600;font-size:12px">${r.type}</div><div style="color:var(--t2);font-size:10px">${fmtDate(r.date)}</div></div><div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--ac)">${r.value}</div></div>`).join('')}</div>`;}
+  if(!progress.length)return html+`<div class="es"><div class="ei">📊</div><div class="et">Sin registros aún</div><div class="esub">Tu entrenador irá agregando tu progreso</div></div>`;
+  html+=progress.map((p,i,arr)=>{
+    const prev=arr[i+1];const wChg=prev?.weight&&p.weight?(parseFloat(p.weight)-parseFloat(prev.weight)).toFixed(1):null;
+    const fields=[{l:'Peso',v:p.weight,u:'kg'},{l:'Grasa',v:p.fat,u:'%'},{l:'Cintura',v:p.waist,u:'cm'},{l:'Abdomen',v:p.abdomen,u:'cm'},{l:'Pecho',v:p.chest,u:'cm'},{l:'Cadera',v:p.hip,u:'cm'},{l:'Glúteo',v:p.glute,u:'cm'},{l:'Muslo',v:p.thigh,u:'cm'},{l:'Pantorrilla',v:p.calf,u:'cm'},{l:'Brazo',v:p.arm,u:'cm'}].filter(f=>f.v);
+    return`<div class="pri"><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:11px;color:var(--t2)">${fmtDate(p.date)}</span>${wChg?`<span style="font-size:10px;padding:2px 6px;border-radius:5px;background:${parseFloat(wChg)>0?'rgba(255,95,87,.12)':'rgba(200,255,87,.12)'};color:${parseFloat(wChg)>0?'var(--rd)':'var(--ac)'};font-weight:600">${parseFloat(wChg)>0?'+':''}${wChg}kg</span>`:''}</div><div style="display:flex;gap:10px;flex-wrap:wrap">${fields.map(f=>`<div><div style="font-family:var(--fd);font-size:15px;font-weight:800">${f.v}<span style="font-size:9px;color:var(--t2)">${f.u}</span></div><div style="font-size:10px;color:var(--t2)">${f.l}</div></div>`).join('')}</div>${p.notes?`<div style="font-size:11px;color:var(--t2);border-top:1px solid var(--bd);padding-top:6px">📝 ${p.notes}</div>`:''}</div>`;
+  }).join('');
+  return html;
+}
+
+function initChart(){
+  const progress=[...getProgress(clientId)].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const canvas=document.getElementById('progress-chart');if(!canvas)return;
+  if(chartInstance){chartInstance.destroy();chartInstance=null;}
+  const labels=progress.map(p=>fmtDate(p.date));
+  const values=progress.map(p=>parseFloat(p[currentChartMetric]||0)).filter((_,i)=>progress[i][currentChartMetric]);
+  const validLabels=labels.filter((_,i)=>progress[i][currentChartMetric]);
+  if(!values.length){canvas.parentElement.innerHTML='<div style="text-align:center;padding:30px;color:var(--t3);font-size:12px">Sin datos para esta métrica</div>';return;}
+  chartInstance=new Chart(canvas,{type:'line',data:{labels:validLabels,datasets:[{data:values,borderColor:'#c8ff57',backgroundColor:'rgba(200,255,87,.08)',tension:.4,fill:true,pointBackgroundColor:'#c8ff57',pointRadius:4,pointHoverRadius:6,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(15,15,26,.95)',titleColor:'#c8ff57',bodyColor:'#eeeef8',borderColor:'#252535',borderWidth:1,padding:10,cornerRadius:8}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'var(--t2)',font:{size:9}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'var(--t2)',font:{size:9}}}}}});
+}
+
+function changeChartMetric(metric,btn){
+  currentChartMetric=metric;
+  document.querySelectorAll('.chart-metric-btns .cmbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');initChart();
+}
+
+function renderFotosTab(){
+  const photos=getPhotos(clientId);
+  if(!photos.before&&!photos.after)return`<div class="es"><div class="ei">📸</div><div class="et">Sin fotos aún</div><div class="esub">Tu entrenador agregará las fotos comparativas aquí</div></div>`;
+  return`<div style="font-size:11px;color:var(--t2);margin-bottom:8px;text-align:center">Comparación antes / después</div>
+  <div class="photo-compare">
+    <div class="photo-slot">${photos.before?`<img src="${photos.before}" alt="Antes">`:'<div style="font-size:28px;opacity:.3">📷</div>'}<div class="photo-slot-label">ANTES</div></div>
+    <div class="photo-slot">${photos.after?`<img src="${photos.after}" alt="Después">`:'<div style="font-size:28px;opacity:.3">📷</div>'}<div class="photo-slot-label">DESPUÉS</div></div>
+  </div>`;
+}
+
+function renderRutinasTab(){
+  const routines=getRoutines(clientId);
+  if(!routines.length)return`<div class="es"><div class="ei">🏋️</div><div class="et">Sin rutinas asignadas</div><div class="esub">Tu entrenador asignará tus rutinas pronto</div></div>`;
+  return routines.map(r=>`<div class="card" style="margin-bottom:7px"><div style="padding:11px 13px;border-bottom:1px solid var(--bd)"><div style="font-weight:700;font-size:13px">${r.name}</div><div style="font-size:10px;color:var(--t2);margin-top:1px">${[r.days,r.duration?r.duration+' min':'',r.types].filter(Boolean).join(' · ')}</div></div><div style="padding:9px 13px;display:flex;flex-direction:column;gap:5px">${(r.exercises||[]).map((ex,i)=>`<div style="display:flex;align-items:center;gap:8px;background:var(--s2);border-radius:8px;padding:8px 10px"><div style="width:22px;height:22px;border-radius:6px;background:rgba(200,255,87,.1);color:var(--ac);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:10px;flex-shrink:0">${i+1}</div><div><div style="font-weight:600;font-size:12px">${ex.name}</div><div style="font-size:10px;color:var(--t2)">${[ex.sets&&ex.sets+' series',ex.reps&&ex.reps+' reps',ex.rest&&ex.rest+'s desc'].filter(Boolean).join(' · ')}</div></div></div>`).join('')}${r.notes?`<div style="font-size:10px;color:var(--t2);padding-top:2px">📝 ${r.notes}</div>`:''}</div></div>`).join('');
+}
+
+function renderDietaTab(){
+  const meals=getMeals(clientId);const c=clientData;
+  const allergyBadges=(c.allergies||[]).map(a=>`<span style="background:rgba(255,95,87,.1);color:var(--rd);border:1px solid rgba(255,95,87,.25);border-radius:5px;font-size:9px;padding:2px 6px;font-weight:600">${a}</span>`).join('');
+  const dietTypeBadge=c.dietType?`<span style="background:rgba(200,255,87,.1);color:var(--ac);border:1px solid rgba(200,255,87,.25);border-radius:5px;font-size:9px;padding:2px 7px;font-weight:600">🥗 ${c.dietType}</span>`:'';
+  let html='';
+  if(allergyBadges||dietTypeBadge||c.dislikes){html+=`<div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);padding:10px 12px;margin-bottom:8px"><div style="font-size:10px;font-weight:600;color:var(--t2);letter-spacing:.3px;text-transform:uppercase;margin-bottom:6px">Perfil alimentario</div><div style="display:flex;gap:4px;flex-wrap:wrap">${allergyBadges}${dietTypeBadge}</div>${c.dislikes?`<div style="font-size:10px;color:var(--t2);margin-top:3px">🚫 No como: ${c.dislikes}</div>`:''}</div>`;}
+  if(!meals.length)return html+`<div class="es"><div class="ei">🥗</div><div class="et">Sin plan de dieta</div><div class="esub">Tu entrenador asignará tu plan pronto</div></div>`;
+  return html+meals.map(m=>`<div class="card" style="margin-bottom:7px"><div style="padding:11px 13px;border-bottom:1px solid var(--bd)"><div style="font-weight:700;font-size:13px">${m.name}</div><div style="font-size:10px;color:var(--t2);margin-top:1px">${[m.calories&&m.calories+' kcal',m.protein&&'P:'+m.protein+'g',m.carbs&&'C:'+m.carbs+'g',m.fats&&'G:'+m.fats+'g'].filter(Boolean).join(' · ')}</div></div><div style="padding:9px 13px;display:flex;flex-direction:column;gap:5px">${(m.meals||[]).map(ml=>`<div style="background:var(--s2);border-radius:8px;padding:8px 10px"><div style="font-size:9px;color:var(--ac);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">${ml.time}</div><div style="font-weight:500;font-size:12px">${ml.food}</div></div>`).join('')}${m.notes?`<div style="font-size:10px;color:var(--t2);padding-top:2px">📝 ${m.notes}</div>`:''}</div></div>`).join('');
+}
+
+function renderPagosTab(){
+  const pays=getPayments(clientId);const st=payStatus(pays);const pl=payLabel(st);
+  const sorted=[...pays].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const total=pays.reduce((s,p)=>s+parseFloat(p.amount||0),0);
+  let html=`<div style="margin-bottom:10px"><span style="font-size:10px;padding:3px 9px;border-radius:5px;background:${pl.bg};color:${pl.color};font-weight:600">${pl.text}</span></div>`;
+  if(!pays.length)return html+`<div class="es"><div class="ei">💰</div><div class="et">Sin pagos registrados</div></div>`;
+  return html+`<div class="card" style="padding:0 13px;margin-bottom:7px">${sorted.map(p=>`<div class="pi"><div style="flex:1"><div class="pa">$${fmtMoney(p.amount)}</div><div style="font-size:10px;color:var(--t2);margin-top:1px">${fmtDate(p.date)}${p.concept?' · '+p.concept:''}</div>${p.nextDate?`<div style="font-size:10px;color:var(--t3);margin-top:1px">Próximo: ${fmtDate(p.nextDate)}</div>`:''}</div><span style="font-size:10px;padding:2px 7px;border-radius:5px;background:var(--s2);color:var(--t2);font-weight:500">${p.method||''}</span></div>`).join('')}</div><div style="text-align:right;font-size:11px;color:var(--t2)">Total pagado: <strong style="color:var(--ac);font-family:var(--fd);font-size:14px">$${fmtMoney(total)}</strong></div>`;
+}
+
+function renderMetasTab(){
+  const goals=getGoals(clientId);
+  if(!goals.length)return`<div class="es"><div class="ei">🎯</div><div class="et">Sin metas definidas</div><div class="esub">Tu entrenador configurará tus metas pronto</div></div>`;
+  return goals.map(g=>{const pct=Math.min(100,g.pct||0);const done=pct>=100;return`<div class="pri" style="margin-bottom:7px"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div style="font-weight:600;font-size:13px">${done?'✅ ':''}${g.name}</div><span style="font-family:var(--fd);font-size:16px;font-weight:800;color:${done?'var(--ac)':'var(--ac2)'};flex-shrink:0">${pct}%</span></div>${g.date?`<div style="font-size:10px;color:var(--t2)">📅 Fecha límite: ${fmtDate(g.date)}</div>`:''}<div style="background:var(--bd);border-radius:4px;height:7px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${done?'var(--ac)':'linear-gradient(90deg,var(--ac2),var(--ac))'};border-radius:4px"></div></div></div>`;}).join('');
+}
+</script>
+</body>
+</html>
