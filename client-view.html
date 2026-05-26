@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#080810">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Mi Perfil | Abreu Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080810;--s1:#0f0f1a;--s2:#171724;--s3:#1e1e2e;--bd:#252535;--bd2:#2e2e42;
+  --ac:#c8ff57;--ac2:#57c8ff;--rd:#ff5f57;--yw:#ffca28;--pu:#a78bfa;
+  --tx:#eeeef8;--t2:#8080a0;--t3:#404060;
+  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
+  --r:14px;--r2:10px;--r3:8px;
+  --sb:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);-webkit-font-smoothing:antialiased}
+body{color:var(--tx);font-family:var(--fb);font-size:14px}
+#app{max-width:480px;margin:0 auto;padding:16px 14px;padding-bottom:calc(32px + var(--sb));display:flex;flex-direction:column;gap:14px}
+
+/* Loading */
+#loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px}
+.spinner{width:40px;height:40px;border:3px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{color:var(--t2);font-size:13px}
+
+/* Header */
+.topbar{position:sticky;top:0;z-index:10;background:rgba(8,8,16,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--fd);font-weight:800;font-size:18px;color:var(--ac);letter-spacing:-.5px}
+.logo span{color:var(--tx)}
+.synced-at{font-size:10px;color:var(--t2)}
+
+/* Profile card */
+.profile-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:18px;display:flex;gap:14px;align-items:center}
+.avatar{width:64px;height:64px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:22px;color:var(--ac);flex-shrink:0}
+.profile-info{flex:1;min-width:0}
+.profile-name{font-family:var(--fd);font-size:18px;font-weight:800;line-height:1.1}
+.profile-goal{color:var(--t2);font-size:12px;margin-top:4px}
+.badge{font-size:9px;padding:2px 7px;border-radius:5px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;display:inline-block;margin-top:6px}
+.badge-ac{background:rgba(200,255,87,.12);color:var(--ac)}
+.badge-rd{background:rgba(255,95,87,.12);color:var(--rd)}
+.badge-yw{background:rgba(255,202,40,.12);color:var(--yw)}
+.badge-t{background:rgba(128,128,160,.1);color:var(--t2)}
+
+/* Section */
+.section-title{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--t2);letter-spacing:.5px;text-transform:uppercase;padding:4px 0}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.card-row{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-row:last-child{border-bottom:none}
+.row-label{color:var(--t2);font-size:12px}
+.row-val{font-weight:600;font-size:13px;text-align:right}
+
+/* Stats grid */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px}
+.sv{font-family:var(--fd);font-size:22px;font-weight:800}
+.sl{color:var(--t2);font-size:10px;margin-top:2px;text-transform:uppercase;letter-spacing:.2px}
+
+/* Payments */
+.pay-item{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.pay-item:last-child{border-bottom:none}
+.pay-desc{font-size:13px;font-weight:500}
+.pay-date{font-size:10px;color:var(--t2);margin-top:2px}
+.pay-amount{font-family:var(--fd);font-weight:700;font-size:15px;color:var(--ac)}
+
+/* Progress */
+.prog-item{padding:12px 14px;border-bottom:1px solid var(--bd)}
+.prog-item:last-child{border-bottom:none}
+.prog-date{font-size:11px;color:var(--t2);margin-bottom:6px}
+.prog-stats{display:flex;gap:12px;flex-wrap:wrap}
+.prog-stat{font-size:12px}
+.prog-stat span{font-weight:600;color:var(--ac2)}
+
+/* Routines */
+.routine-item{padding:12px 14px;border-bottom:1px solid var(--bd)}
+.routine-item:last-child{border-bottom:none}
+.routine-name{font-weight:600;font-size:13px}
+.routine-day{font-size:11px;color:var(--t2);margin-top:2px}
+.routine-exercises{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.ex-row{font-size:12px;color:var(--t2);padding-left:8px;border-left:2px solid var(--bd2)}
+.ex-row strong{color:var(--tx)}
+
+/* Meals */
+.meal-item{padding:12px 14px;border-bottom:1px solid var(--bd)}
+.meal-item:last-child{border-bottom:none}
+.meal-name{font-weight:600;font-size:13px}
+.meal-cals{font-size:11px;color:var(--yw);margin-top:2px}
+.meal-foods{margin-top:6px;font-size:12px;color:var(--t2);line-height:1.5}
+
+/* Empty */
+.empty{padding:24px;text-align:center;color:var(--t3);font-size:13px}
+
+/* Error */
+#error-screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;padding:32px;text-align:center}
+.error-icon{font-size:48px}
+.error-title{font-family:var(--fd);font-size:20px;font-weight:800}
+.error-msg{color:var(--t2);font-size:13px;line-height:1.6}
+
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#app{animation:fi .3s ease}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="load-txt">Cargando tu perfil...</div>
+</div>
+
+<div id="error-screen">
+  <div class="error-icon">⚠️</div>
+  <div class="error-title">No se pudo cargar</div>
+  <div class="error-msg" id="error-msg">El link puede estar desactualizado. Pide a tu entrenador que sincronice de nuevo.</div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="topbar">
+    <div class="logo">Abreu<span>Manager</span></div>
+    <div class="synced-at" id="synced-at"></div>
+  </div>
+
+  <!-- Perfil -->
+  <div class="profile-card" id="profile-card"></div>
+
+  <!-- Stats -->
+  <div class="section-title">📊 Medidas</div>
+  <div class="sgrid" id="stats-grid"></div>
+
+  <!-- Pagos -->
+  <div class="section-title">💳 Pagos</div>
+  <div class="card" id="payments-card"></div>
+
+  <!-- Progreso -->
+  <div class="section-title">📈 Progreso</div>
+  <div class="card" id="progress-card"></div>
+
+  <!-- Rutinas -->
+  <div class="section-title">🏋️ Rutinas</div>
+  <div class="card" id="routines-card"></div>
+
+  <!-- Comidas -->
+  <div class="section-title">🥗 Plan de comidas</div>
+  <div class="card" id="meals-card"></div>
+</div>
+
+<script>
+const FIREBASE_URL='https://abreu-maneger-default-rtdb.firebaseio.com';
+
+function getParams(){
+  const p=new URLSearchParams(location.search);
+  return{trainerId:p.get('trainer'),clientId:p.get('id')};
+}
+
+function showError(msg){
+  document.getElementById('loading').style.display='none';
+  const el=document.getElementById('error-screen');
+  el.style.display='flex';
+  if(msg)document.getElementById('error-msg').textContent=msg;
+}
+
+function fmt(d){
+  if(!d)return'—';
+  try{return new Date(d).toLocaleDateString('es-DO',{day:'2-digit',month:'short',year:'numeric'});}catch{return d;}
+}
+
+function initials(name){
+  if(!name)return'?';
+  return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+}
+
+function statusBadge(s){
+  const map={activo:'badge-ac',inactivo:'badge-rd',pendiente:'badge-yw',prueba:'badge-t'};
+  return`<span class="badge ${map[s]||'badge-t'}">${s||'—'}</span>`;
+}
+
+function renderProfile(c){
+  document.getElementById('profile-card').innerHTML=`
+    <div class="avatar">${initials(c.name)}</div>
+    <div class="profile-info">
+      <div class="profile-name">${c.name||'Cliente'}</div>
+      <div class="profile-goal">${c.goal||''}</div>
+      ${statusBadge(c.status)}
+    </div>`;
+}
+
+function renderStats(c){
+  const items=[
+    {v:c.weight?c.weight+' kg':'—',l:'Peso'},
+    {v:c.height?c.height+' cm':'—',l:'Altura'},
+    {v:c.age?c.age+' años':'—',l:'Edad'},
+    {v:c.bf?c.bf+'%':'—',l:'% Grasa'},
+  ].filter(x=>x.v!=='—');
+  if(!items.length){document.getElementById('stats-grid').innerHTML='<p class="empty" style="grid-column:span 2">Sin medidas registradas</p>';return;}
+  document.getElementById('stats-grid').innerHTML=items.map(i=>`
+    <div class="sc"><div class="sv">${i.v}</div><div class="sl">${i.l}</div></div>`).join('');
+}
+
+function renderPayments(payments){
+  const el=document.getElementById('payments-card');
+  if(!payments||!payments.length){el.innerHTML='<div class="empty">Sin pagos registrados</div>';return;}
+  el.innerHTML=[...payments].reverse().slice(0,10).map(p=>`
+    <div class="pay-item">
+      <div><div class="pay-desc">${p.concept||p.type||'Pago'}</div><div class="pay-date">${fmt(p.date)}</div></div>
+      <div class="pay-amount">$${Number(p.amount||0).toLocaleString()}</div>
+    </div>`).join('');
+}
+
+function renderProgress(progress){
+  const el=document.getElementById('progress-card');
+  if(!progress||!progress.length){el.innerHTML='<div class="empty">Sin registros de progreso</div>';return;}
+  el.innerHTML=[...progress].reverse().slice(0,5).map(r=>{
+    const stats=[];
+    if(r.weight)stats.push(`Peso: <span>${r.weight} kg</span>`);
+    if(r.fat)stats.push(`Grasa: <span>${r.fat}%</span>`);
+    if(r.muscle)stats.push(`Músculo: <span>${r.muscle}%</span>`);
+    if(r.waist)stats.push(`Cintura: <span>${r.waist} cm</span>`);
+    return`<div class="prog-item"><div class="prog-date">${fmt(r.date)}</div><div class="prog-stats">${stats.map(s=>`<div class="prog-stat">${s}</div>`).join('')}</div></div>`;
+  }).join('');
+}
+
+function renderRoutines(routines){
+  const el=document.getElementById('routines-card');
+  if(!routines||!routines.length){el.innerHTML='<div class="empty">Sin rutinas asignadas</div>';return;}
+  el.innerHTML=routines.map(r=>`
+    <div class="routine-item">
+      <div class="routine-name">${r.name||'Rutina'}</div>
+      <div class="routine-day">${r.day||''} ${r.type?'· '+r.type:''}</div>
+      <div class="routine-exercises">
+        ${(r.exercises||[]).slice(0,6).map(e=>`<div class="ex-row"><strong>${e.name||e}</strong>${e.sets?' · '+e.sets+'×'+(e.reps||''):''}${e.weight?' · '+e.weight+'kg':''}</div>`).join('')}
+        ${(r.exercises||[]).length>6?`<div class="ex-row" style="color:var(--t3)">+${r.exercises.length-6} más...</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function renderMeals(meals){
+  const el=document.getElementById('meals-card');
+  if(!meals||!meals.length){el.innerHTML='<div class="empty">Sin plan de comidas</div>';return;}
+  el.innerHTML=meals.map(m=>`
+    <div class="meal-item">
+      <div class="meal-name">${m.name||'Comida'}</div>
+      ${m.calories?`<div class="meal-cals">${m.calories} kcal</div>`:''}
+      <div class="meal-foods">${(m.foods||[]).join(' · ')||m.description||''}</div>
+    </div>`).join('');
+}
+
+async function loadData(){
+  const{trainerId,clientId}=getParams();
+  if(!trainerId||!clientId){showError('Link inválido. Pide a tu entrenador el link correcto.');return;}
+
+  try{
+    const ctrl=new AbortController();
+    const tid=setTimeout(()=>ctrl.abort(),15000);
+    const res=await fetch(FIREBASE_URL+'/trainers/'+trainerId+'.json',{signal:ctrl.signal});
+    clearTimeout(tid);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const payload=await res.json();
+    if(!payload)throw new Error('Sin datos');
+
+    const client=(payload.clients||[]).find(c=>String(c.id)===String(clientId));
+    if(!client){showError('No se encontró tu perfil. Pide a tu entrenador que sincronice de nuevo.');return;}
+
+    // Render
+    document.getElementById('loading').style.display='none';
+    document.getElementById('app').style.display='flex';
+    if(payload.syncedAt){
+      document.getElementById('synced-at').textContent='Actualizado '+fmt(payload.syncedAt);
+    }
+    document.title=client.name+' | Abreu Manager';
+
+    renderProfile(client);
+    renderStats(client);
+    renderPayments(payload['payments_'+clientId]);
+    renderProgress(payload['progress_'+clientId]);
+    renderRoutines(payload['routines_'+clientId]);
+    renderMeals(payload['meals_'+clientId]);
+
+  }catch(e){
+    const msg=e.name==='AbortError'?'Sin conexión. Verifica tu internet e intenta de nuevo.':'No se pudo cargar el perfil. Intenta de nuevo más tarde.';
+    showError(msg);
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
