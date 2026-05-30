@@ -15,42 +15,42 @@
   --ac:#c8ff57;--ac2:#57c8ff;--rd:#ff5f57;--yw:#ffca28;--pu:#a78bfa;
   --tx:#eeeef8;--t2:#8080a0;--t3:#404060;
   --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
-  --r:14px;--r2:10px;--r3:8px;
+  --r:14px;--r2:10px;
   --sb:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden}
 
-/* ── LOADING ── */
+/* LOADING */
 #loading{position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:var(--bg)}
 .spinner{width:36px;height:36px;border:2.5px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .load-txt{color:var(--t2);font-size:13px;font-family:var(--fd)}
 
-/* ── ERROR ── */
+/* ERROR */
 #error-screen{position:fixed;inset:0;z-index:998;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px;text-align:center;background:var(--bg)}
 .error-icon{font-size:52px}
 .error-title{font-family:var(--fd);font-size:22px;font-weight:800}
 .error-msg{color:var(--t2);font-size:13px;line-height:1.7;max-width:300px}
 
-/* ── TOPBAR ── */
+/* TOPBAR */
 .topbar{position:sticky;top:0;z-index:100;background:rgba(8,8,16,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:11px 15px;display:flex;align-items:center;justify-content:space-between}
 .logo{font-family:var(--fd);font-weight:800;font-size:17px;color:var(--ac);letter-spacing:-.3px}
 .logo span{color:var(--tx)}
 .sync-chip{font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px}
 .sync-dot{width:5px;height:5px;border-radius:50%;background:var(--ac);box-shadow:0 0 5px var(--ac);flex-shrink:0}
 
-/* ── HERO ── */
-.hero{padding:20px 15px 0;display:flex;flex-direction:column;gap:0}
-.hero-card{background:linear-gradient(135deg,var(--s1) 0%,var(--s2) 100%);border:1px solid var(--bd);border-radius:20px;padding:20px;position:relative;overflow:hidden}
-.hero-card::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(200,255,87,.07) 0%,transparent 70%);pointer-events:none}
-.hero-card::after{content:'';position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(87,200,255,.05) 0%,transparent 70%);pointer-events:none}
+/* HERO */
+.hero{padding:16px 15px 0}
+.hero-card{background:linear-gradient(135deg,var(--s1) 0%,var(--s2) 100%);border:1px solid var(--bd);border-radius:20px;padding:18px;position:relative;overflow:hidden}
+.hero-card::before{content:'';position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(200,255,87,.07) 0%,transparent 70%);pointer-events:none}
 .hero-top{display:flex;align-items:flex-start;gap:14px}
-.avatar{width:62px;height:62px;border-radius:16px;background:var(--s3);border:1.5px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:20px;color:var(--ac);flex-shrink:0;position:relative}
-.avatar-ring{position:absolute;inset:-3px;border-radius:19px;border:1.5px solid rgba(200,255,87,.25)}
+.avatar{width:60px;height:60px;border-radius:16px;background:var(--s3);border:1.5px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:20px;color:var(--ac);flex-shrink:0;position:relative;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:16px}
+.avatar-ring{position:absolute;inset:-3px;border-radius:19px;border:1.5px solid rgba(200,255,87,.25);pointer-events:none}
 .hero-info{flex:1;min-width:0;padding-top:2px}
-.hero-name{font-family:var(--fd);font-size:20px;font-weight:800;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-name{font-family:var(--fd);font-size:19px;font-weight:800;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hero-goal{color:var(--t2);font-size:12px;margin-top:4px;line-height:1.4}
 .badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;padding:3px 8px;border-radius:6px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:7px}
 .badge::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.7}
@@ -58,128 +58,120 @@ body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden}
 .badge-rd{background:rgba(255,95,87,.1);color:var(--rd);border:1px solid rgba(255,95,87,.2)}
 .badge-yw{background:rgba(255,202,40,.1);color:var(--yw);border:1px solid rgba(255,202,40,.2)}
 .badge-t{background:rgba(128,128,160,.08);color:var(--t2);border:1px solid var(--bd)}
-.hero-divider{height:1px;background:var(--bd);margin:16px 0}
-.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.hero-divider{height:1px;background:var(--bd);margin:14px 0}
+.hero-stats{display:grid;gap:0}
 .hstat{text-align:center;padding:4px 0}
 .hstat+.hstat{border-left:1px solid var(--bd)}
-.hstat-val{font-family:var(--fd);font-size:16px;font-weight:800;color:var(--tx);line-height:1}
-.hstat-lbl{font-size:9px;color:var(--t2);margin-top:4px;text-transform:uppercase;letter-spacing:.3px}
+.hstat-val{font-family:var(--fd);font-size:15px;font-weight:800;color:var(--tx);line-height:1}
+.hstat-unit{font-size:9px;font-weight:400;color:var(--t2)}
+.hstat-lbl{font-size:9px;color:var(--t2);margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
 
-/* ── TABS ── */
-.tabs-wrap{padding:14px 15px 0;position:sticky;top:44px;z-index:90;background:var(--bg);padding-bottom:2px}
+/* TABS */
+.tabs-wrap{padding:12px 15px 0;position:sticky;top:44px;z-index:90;background:var(--bg);padding-bottom:2px}
 .tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:8px}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;font-family:var(--fb);cursor:pointer;border:1px solid var(--bd);background:var(--s1);color:var(--t2);transition:all .2s;letter-spacing:.2px;display:flex;align-items:center;gap:5px}
-.tab.active{background:var(--ac);color:#080810;border-color:var(--ac);box-shadow:0 0 12px rgba(200,255,87,.25)}
-.tab-icon{font-size:13px}
+.tab{flex-shrink:0;padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;font-family:var(--fb);cursor:pointer;border:1px solid var(--bd);background:var(--s1);color:var(--t2);transition:all .18s;display:flex;align-items:center;gap:5px}
+.tab.active{background:var(--ac);color:#080810;border-color:var(--ac);box-shadow:0 0 12px rgba(200,255,87,.22)}
 
-/* ── PAGES ── */
-.page{display:none;padding:14px 15px;padding-bottom:calc(30px + var(--sb));flex-direction:column;gap:12px;animation:fi .22s ease}
+/* PAGES */
+.page{display:none;padding:12px 15px;padding-bottom:calc(30px + var(--sb));flex-direction:column;gap:11px;animation:fi .2s ease}
 .page.active{display:flex}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
-/* ── CARDS ── */
+/* CARDS */
 .card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
-.card-hdr{padding:13px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
-.card-hdr-title{font-family:var(--fd);font-size:13px;font-weight:700}
+.card-hdr{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.card-hdr-title{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.4px}
 .card-hdr-count{font-size:11px;color:var(--t2);background:var(--s2);padding:2px 8px;border-radius:5px;border:1px solid var(--bd)}
 
-/* ── INFO ROWS ── */
-.info-row{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;gap:12px}
+/* INFO ROWS */
+.info-row{padding:11px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .info-row:last-child{border-bottom:none}
-.info-lbl{font-size:12px;color:var(--t2)}
-.info-val{font-size:13px;font-weight:600;text-align:right;color:var(--tx)}
+.info-lbl{font-size:12px;color:var(--t2);flex-shrink:0}
+.info-val{font-size:13px;font-weight:600;text-align:right;color:var(--tx);word-break:break-word}
 
-/* ── STAT GRID ── */
-.sgrid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.sc{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px 13px}
-.sv{font-family:var(--fd);font-size:21px;font-weight:800;color:var(--tx)}
+/* STAT GRID */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:13px}
+.sv{font-family:var(--fd);font-size:20px;font-weight:800}
 .sl{color:var(--t2);font-size:10px;margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
-.sc.accent .sv{color:var(--ac)}
-.sc.blue .sv{color:var(--ac2)}
-.sc.yellow .sv{color:var(--yw)}
-.sc.purple .sv{color:var(--pu)}
+.sc.ac .sv{color:var(--ac)}
+.sc.bl .sv{color:var(--ac2)}
+.sc.yw .sv{color:var(--yw)}
+.sc.pu .sv{color:var(--pu)}
+.sc.rd .sv{color:var(--rd)}
 
-/* ── PAYMENTS ── */
-.pay-item{padding:13px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px}
+/* PAYMENTS */
+.pay-item{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:11px}
 .pay-item:last-child{border-bottom:none}
-.pay-icon{width:36px;height:36px;border-radius:10px;background:rgba(200,255,87,.08);border:1px solid rgba(200,255,87,.15);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.pay-icon{width:34px;height:34px;border-radius:9px;background:rgba(200,255,87,.07);border:1px solid rgba(200,255,87,.14);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 .pay-body{flex:1;min-width:0}
 .pay-desc{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pay-date{font-size:10px;color:var(--t2);margin-top:2px}
+.pay-sub{font-size:10px;color:var(--t2);margin-top:2px}
 .pay-right{text-align:right;flex-shrink:0}
 .pay-amount{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--ac)}
-.pay-status{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-top:3px}
-.pay-status.paid{color:var(--ac)}
-.pay-status.pending{color:var(--yw)}
+.pay-next{font-size:10px;color:var(--t2);margin-top:2px}
 
-/* ── PROGRESS ── */
-.prog-item{padding:14px;border-bottom:1px solid var(--bd)}
+/* PROGRESS */
+.prog-item{padding:13px 14px;border-bottom:1px solid var(--bd)}
 .prog-item:last-child{border-bottom:none}
 .prog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.prog-date{font-size:11px;font-weight:600;color:var(--t2)}
-.prog-tag{font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(87,200,255,.08);color:var(--ac2);border:1px solid rgba(87,200,255,.15);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
-.prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.prog-stat{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);padding:9px 11px}
-.prog-stat-val{font-family:var(--fd);font-size:15px;font-weight:800;color:var(--ac2)}
-.prog-stat-lbl{font-size:10px;color:var(--t2);margin-top:2px}
-.prog-note{margin-top:9px;font-size:12px;color:var(--t2);line-height:1.5;padding:9px 11px;background:var(--s2);border-radius:var(--r2);border:1px solid var(--bd)}
+.prog-date{font-size:12px;font-weight:600;color:var(--tx)}
+.prog-tag{font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(87,200,255,.08);color:var(--ac2);border:1px solid rgba(87,200,255,.15);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.prog-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.prog-stat{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 10px}
+.prog-stat-val{font-family:var(--fd);font-size:14px;font-weight:800;color:var(--ac2)}
+.prog-stat-lbl{font-size:9px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:.2px}
+.prog-note{margin-top:8px;font-size:12px;color:var(--t2);line-height:1.5;padding:9px 11px;background:var(--s2);border-radius:var(--r2);border:1px solid var(--bd)}
 
-/* ── ROUTINES ── */
-.routine-item{border-bottom:1px solid var(--bd)}
-.routine-item:last-child{border-bottom:none}
-.routine-header{padding:13px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s}
-.routine-header:active{background:var(--s2)}
-.routine-dot{width:8px;height:8px;border-radius:50%;background:var(--pu);box-shadow:0 0 6px rgba(167,139,250,.4);flex-shrink:0}
-.routine-info{flex:1}
-.routine-name{font-weight:700;font-size:13px}
-.routine-meta{font-size:10px;color:var(--t2);margin-top:2px}
-.routine-arrow{font-size:11px;color:var(--t3);transition:transform .2s}
-.routine-arrow.open{transform:rotate(90deg)}
-.routine-body{display:none;padding:0 14px 13px}
-.routine-body.open{display:block}
-.ex-list{display:flex;flex-direction:column;gap:6px}
-.ex-row{display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2)}
-.ex-num{width:20px;height:20px;border-radius:6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--pu);flex-shrink:0}
+/* ACCORDION */
+.acc-item{border-bottom:1px solid var(--bd)}
+.acc-item:last-child{border-bottom:none}
+.acc-hdr{padding:13px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .12s;user-select:none}
+.acc-hdr:active{background:var(--s2)}
+.acc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.acc-dot-pu{background:var(--pu);box-shadow:0 0 5px rgba(167,139,250,.4)}
+.acc-dot-yw{background:var(--yw);box-shadow:0 0 5px rgba(255,202,40,.3)}
+.acc-main{flex:1;min-width:0}
+.acc-title{font-weight:700;font-size:13px}
+.acc-sub{font-size:10px;color:var(--t2);margin-top:2px}
+.acc-arrow{font-size:14px;color:var(--t3);transition:transform .2s;flex-shrink:0}
+.acc-arrow.open{transform:rotate(90deg)}
+.acc-body{display:none;padding:0 14px 13px}
+.acc-body.open{display:block}
+
+/* EXERCISES */
+.ex-list{display:flex;flex-direction:column;gap:5px}
+.ex-row{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2)}
+.ex-num{width:19px;height:19px;border-radius:5px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--pu);flex-shrink:0}
 .ex-info{flex:1}
 .ex-name{font-size:12px;font-weight:600}
 .ex-detail{font-size:10px;color:var(--t2);margin-top:2px}
 
-/* ── MEALS ── */
-.meal-item{border-bottom:1px solid var(--bd)}
-.meal-item:last-child{border-bottom:none}
-.meal-header{padding:13px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s}
-.meal-header:active{background:var(--s2)}
-.meal-emoji{font-size:20px;flex-shrink:0;width:32px;text-align:center}
-.meal-info{flex:1}
-.meal-name{font-weight:700;font-size:13px}
-.meal-cal{font-size:10px;color:var(--yw);margin-top:2px}
-.meal-arrow{font-size:11px;color:var(--t3);transition:transform .2s}
-.meal-arrow.open{transform:rotate(90deg)}
-.meal-body{display:none;padding:0 14px 13px}
-.meal-body.open{display:block}
+/* FOODS */
 .food-list{display:flex;flex-direction:column;gap:5px}
-.food-row{padding:8px 11px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);font-size:12px;color:var(--t2);line-height:1.4}
-.food-row strong{color:var(--tx);font-weight:600}
-.meal-note{margin-top:8px;font-size:12px;color:var(--t2);padding:9px 11px;background:var(--s2);border-radius:var(--r2);border:1px solid var(--bd);line-height:1.5}
+.food-row{padding:8px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);font-size:12px;display:flex;align-items:center;gap:8px}
+.food-time{font-size:10px;color:var(--yw);font-weight:600;flex-shrink:0;min-width:44px}
+.food-name{color:var(--tx);flex:1}
 
-/* ── GOALS ── */
-.goal-item{padding:13px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;gap:11px}
-.goal-item:last-child{border-bottom:none}
-.goal-icon{font-size:18px;flex-shrink:0;margin-top:1px}
-.goal-body{flex:1}
-.goal-text{font-size:13px;font-weight:500;line-height:1.5}
-.goal-bar-wrap{margin-top:8px;height:4px;background:var(--bd2);border-radius:2px;overflow:hidden}
-.goal-bar{height:100%;border-radius:2px;background:var(--ac);transition:width .8s ease}
+/* MACROS */
+.macros-row{display:flex;gap:6px;margin-top:8px}
+.macro-chip{flex:1;padding:8px 6px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r2);text-align:center}
+.macro-val{font-family:var(--fd);font-size:14px;font-weight:800}
+.macro-lbl{font-size:9px;color:var(--t2);margin-top:2px;text-transform:uppercase}
 
-/* ── EMPTY ── */
-.empty{padding:32px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
-.empty-icon{font-size:36px;opacity:.4}
-.empty-txt{color:var(--t3);font-size:13px}
+/* EMPTY */
+.empty{padding:28px 16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty-icon{font-size:32px;opacity:.35}
+.empty-txt{color:var(--t3);font-size:12px}
 
-/* ── SECTION LABEL ── */
+/* SEC LABEL */
 .sec-label{font-family:var(--fd);font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;padding:2px 0 0}
+
+/* TOTAL BAR */
+.total-bar{padding:11px 14px;background:rgba(200,255,87,.04);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.total-lbl{font-size:12px;color:var(--t2)}
+.total-val{font-family:var(--fd);font-size:17px;font-weight:800;color:var(--ac)}
 </style>
 </head>
 <body>
@@ -192,7 +184,7 @@ body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden}
 <div id="error-screen">
   <div class="error-icon">😕</div>
   <div class="error-title">No se pudo cargar</div>
-  <div class="error-msg" id="error-msg">El link puede estar desactualizado. Pide a tu entrenador que sincronice de nuevo y te envíe un link nuevo.</div>
+  <div class="error-msg" id="error-msg">El link puede estar desactualizado. Pide a tu entrenador que sincronice de nuevo.</div>
 </div>
 
 <div id="main" style="display:none;flex-direction:column;min-height:100vh">
@@ -206,66 +198,63 @@ body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden}
   <div class="hero">
     <div class="hero-card">
       <div class="hero-top">
-        <div class="avatar" id="hero-avatar">
-          <div class="avatar-ring"></div>
-          ?
-        </div>
+        <div class="avatar" id="hero-avatar"><div class="avatar-ring"></div>?</div>
         <div class="hero-info">
           <div class="hero-name" id="hero-name">—</div>
           <div class="hero-goal" id="hero-goal"></div>
           <div id="hero-badge"></div>
         </div>
       </div>
-      <div class="hero-divider"></div>
+      <div id="hero-divider" class="hero-divider" style="display:none"></div>
       <div class="hero-stats" id="hero-stats"></div>
     </div>
   </div>
 
   <!-- TABS -->
   <div class="tabs-wrap">
-    <div class="tabs" id="tabs">
-      <div class="tab active" data-page="page-perfil"><span class="tab-icon">👤</span>Perfil</div>
-      <div class="tab" data-page="page-pagos"><span class="tab-icon">💳</span>Pagos</div>
-      <div class="tab" data-page="page-progreso"><span class="tab-icon">📈</span>Progreso</div>
-      <div class="tab" data-page="page-rutinas"><span class="tab-icon">🏋️</span>Rutinas</div>
-      <div class="tab" data-page="page-comidas"><span class="tab-icon">🥗</span>Comidas</div>
+    <div class="tabs">
+      <div class="tab active" data-page="page-perfil">👤 Perfil</div>
+      <div class="tab" data-page="page-pagos">💳 Pagos</div>
+      <div class="tab" data-page="page-progreso">📈 Progreso</div>
+      <div class="tab" data-page="page-rutinas">🏋️ Rutinas</div>
+      <div class="tab" data-page="page-comidas">🥗 Comidas</div>
     </div>
   </div>
 
-  <!-- PAGE: PERFIL -->
+  <!-- PERFIL -->
   <div class="page active" id="page-perfil">
     <div class="sec-label">Información personal</div>
     <div class="card" id="card-personal"></div>
 
     <div class="sec-label">Medidas actuales</div>
-    <div class="sgrid2" id="card-medidas"></div>
+    <div class="sgrid" id="card-medidas"></div>
 
     <div class="sec-label">Membresía</div>
     <div class="card" id="card-membresia"></div>
   </div>
 
-  <!-- PAGE: PAGOS -->
+  <!-- PAGOS -->
   <div class="page" id="page-pagos">
     <div class="card" id="card-pagos">
       <div class="empty"><div class="empty-icon">💳</div><div class="empty-txt">Sin pagos registrados</div></div>
     </div>
   </div>
 
-  <!-- PAGE: PROGRESO -->
+  <!-- PROGRESO -->
   <div class="page" id="page-progreso">
     <div class="card" id="card-progreso">
       <div class="empty"><div class="empty-icon">📈</div><div class="empty-txt">Sin registros de progreso</div></div>
     </div>
   </div>
 
-  <!-- PAGE: RUTINAS -->
+  <!-- RUTINAS -->
   <div class="page" id="page-rutinas">
     <div class="card" id="card-rutinas">
       <div class="empty"><div class="empty-icon">🏋️</div><div class="empty-txt">Sin rutinas asignadas</div></div>
     </div>
   </div>
 
-  <!-- PAGE: COMIDAS -->
+  <!-- COMIDAS -->
   <div class="page" id="page-comidas">
     <div class="card" id="card-comidas">
       <div class="empty"><div class="empty-icon">🥗</div><div class="empty-txt">Sin plan de comidas</div></div>
@@ -277,16 +266,23 @@ body{color:var(--tx);font-family:var(--fb);font-size:14px;overflow-x:hidden}
 <script>
 const FIREBASE_URL='https://abreu-maneger-default-rtdb.firebaseio.com';
 
-/* ── UTILS ── */
-function $(id){return document.getElementById(id)}
-function getParams(){const p=new URLSearchParams(location.search);return{trainerId:p.get('trainer'),clientId:p.get('id')};}
-function fmt(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('es-DO',{day:'2-digit',month:'short',year:'numeric'});}catch{return d;}}
-function initials(n){if(!n)return'?';return n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
-function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
-const mealEmojis={'desayuno':'🍳','almuerzo':'🍽️','cena':'🌙','merienda':'🍎','snack':'🥜','pre-entreno':'⚡','post-entreno':'💪'};
-function mealEmoji(name){const k=Object.keys(mealEmojis).find(k=>name&&name.toLowerCase().includes(k));return mealEmojis[k]||'🥗';}
+function $(id){return document.getElementById(id);}
+function esc(s){const d=document.createElement('div');d.textContent=String(s||'');return d.innerHTML;}
+function fmt(d){if(!d)return'—';try{return new Date(d+'T12:00:00').toLocaleDateString('es-DO',{day:'2-digit',month:'short',year:'numeric'});}catch{return d;}}
+function fmtMoney(n){return Number(n||0).toLocaleString('es-DO');}
+function initials(n){if(!n)return'?';return n.trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';}
 
-/* ── TABS ── */
+function getParams(){
+  const p=new URLSearchParams(location.search);
+  return{trainerId:p.get('trainer'),clientId:p.get('id')};
+}
+function showError(msg){
+  $('loading').style.display='none';
+  $('error-screen').style.display='flex';
+  if(msg)$('error-msg').textContent=msg;
+}
+
+/* TABS */
 document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -296,240 +292,270 @@ document.querySelectorAll('.tab').forEach(tab=>{
   });
 });
 
-/* ── ACCORDIONS ── */
-function makeAccordion(container){
-  container.querySelectorAll('.routine-header,.meal-header').forEach(hdr=>{
+/* ACCORDIONS */
+function initAccordions(container){
+  container.querySelectorAll('.acc-hdr').forEach(hdr=>{
     hdr.addEventListener('click',()=>{
-      const arrow=hdr.querySelector('.routine-arrow,.meal-arrow');
       const body=hdr.nextElementSibling;
-      const isOpen=body.classList.contains('open');
-      body.classList.toggle('open',!isOpen);
-      if(arrow)arrow.classList.toggle('open',!isOpen);
+      const arrow=hdr.querySelector('.acc-arrow');
+      const open=body.classList.toggle('open');
+      if(arrow)arrow.classList.toggle('open',open);
     });
   });
 }
 
-/* ── ERROR ── */
-function showError(msg){
-  $('loading').style.display='none';
-  $('error-screen').style.display='flex';
-  if(msg)$('error-msg').textContent=msg;
-}
-
-/* ── RENDER: HERO ── */
+/* ─── HERO ─── */
 function renderHero(c){
-  $('hero-avatar').innerHTML='<div class="avatar-ring"></div>'+initials(c.name);
+  // Avatar con foto si existe
+  const av=$('hero-avatar');
+  if(c.photo){
+    av.innerHTML=`<div class="avatar-ring"></div><img src="${c.photo}" alt="${esc(c.name)}">`;
+  } else {
+    av.innerHTML=`<div class="avatar-ring"></div>${initials(c.name)}`;
+  }
   $('hero-name').textContent=c.name||'Cliente';
   $('hero-goal').textContent=c.goal||'';
   const map={activo:'badge-ac',inactivo:'badge-rd',pendiente:'badge-yw',prueba:'badge-t'};
-  const cls=map[c.status]||'badge-t';
-  $('hero-badge').innerHTML=`<span class="badge ${cls}">${esc(c.status||'Sin estado')}</span>`;
-  // mini-stats
+  $('hero-badge').innerHTML=`<span class="badge ${map[c.status]||'badge-t'}">${esc(c.status||'sin estado')}</span>`;
+
   const stats=[];
   if(c.weight)stats.push({v:c.weight,u:'kg',l:'Peso'});
   if(c.height)stats.push({v:c.height,u:'cm',l:'Altura'});
   if(c.age)stats.push({v:c.age,u:'años',l:'Edad'});
-  if(c.bf)stats.push({v:c.bf,u:'%',l:'Grasa'});
-  if(!stats.length){$('hero-stats').style.display='none';$('hero-stats').previousElementSibling.style.display='none';return;}
-  $('hero-stats').innerHTML=stats.map(s=>`<div class="hstat"><div class="hstat-val">${esc(s.v)}<span style="font-size:10px;font-weight:400;color:var(--t2)"> ${s.u}</span></div><div class="hstat-lbl">${s.l}</div></div>`).join('');
+  if(c.fat||c.bf)stats.push({v:c.fat||c.bf,u:'%',l:'Grasa'});
+
+  if(stats.length){
+    $('hero-divider').style.display='block';
+    $('hero-stats').style.gridTemplateColumns=`repeat(${stats.length},1fr)`;
+    $('hero-stats').innerHTML=stats.map(s=>`
+      <div class="hstat">
+        <div class="hstat-val">${esc(s.v)}<span class="hstat-unit"> ${s.u}</span></div>
+        <div class="hstat-lbl">${s.l}</div>
+      </div>`).join('');
+  }
 }
 
-/* ── RENDER: PERFIL ── */
+/* ─── PERFIL ─── */
 function renderPerfil(c){
   // Personal
-  const personalRows=[
-    {l:'Nombre completo',v:c.name},
+  const rows=[
+    {l:'Nombre',v:c.name},
     {l:'Teléfono',v:c.phone},
     {l:'Email',v:c.email},
-    {l:'Fecha de nacimiento',v:fmt(c.dob)},
+    {l:'Edad',v:c.age?c.age+' años':null},
     {l:'Género',v:c.gender},
     {l:'Objetivo',v:c.goal},
+    {l:'Alergias',v:(c.allergies||[]).join(', ')||null},
+    {l:'No le gusta',v:(c.dislikes||[]).join(', ')||null},
+    {l:'Tipo de dieta',v:c.dietType},
     {l:'Notas',v:c.notes},
-  ].filter(r=>r.v);
-  $('card-personal').innerHTML=personalRows.length
-    ? personalRows.map(r=>`<div class="info-row"><span class="info-lbl">${esc(r.l)}</span><span class="info-val">${esc(r.v)}</span></div>`).join('')
-    : '<div class="empty"><div class="empty-icon">👤</div><div class="empty-txt">Sin información personal</div></div>';
+  ].filter(r=>r.v&&String(r.v).trim());
+  $('card-personal').innerHTML=rows.length
+    ?rows.map(r=>`<div class="info-row"><span class="info-lbl">${esc(r.l)}</span><span class="info-val">${esc(r.v)}</span></div>`).join('')
+    :'<div class="empty"><div class="empty-icon">👤</div><div class="empty-txt">Sin información</div></div>';
 
   // Medidas
-  const medidas=[
-    {v:c.weight,u:'kg',l:'Peso',cls:'accent'},
-    {v:c.height,u:'cm',l:'Altura',cls:'blue'},
-    {v:c.age,u:'años',l:'Edad',cls:''},
-    {v:c.bf,u:'%',l:'% Grasa',cls:'yellow'},
-    {v:c.muscle,u:'%',l:'% Músculo',cls:'purple'},
-    {v:c.waist,u:'cm',l:'Cintura',cls:''},
+  const meds=[
+    {v:c.weight,u:'kg',l:'Peso',cl:'ac'},
+    {v:c.height,u:'cm',l:'Altura',cl:'bl'},
+    {v:c.fat||c.bf,u:'%',l:'% Grasa',cl:'yw'},
+    {v:c.muscle,u:'%',l:'% Músculo',cl:'pu'},
+    {v:c.waist,u:'cm',l:'Cintura',cl:''},
+    {v:c.chest,u:'cm',l:'Pecho',cl:''},
   ].filter(m=>m.v);
-  $('card-medidas').innerHTML=medidas.length
-    ? medidas.map(m=>`<div class="sc ${m.cls}"><div class="sv">${esc(m.v)}<span style="font-size:12px;font-weight:400;color:var(--t2)"> ${m.u}</span></div><div class="sl">${m.l}</div></div>`).join('')
-    : '<div class="sc" style="grid-column:span 2"><div class="empty"><div class="empty-icon" style="font-size:24px">📏</div><div class="empty-txt">Sin medidas</div></div></div>';
+  $('card-medidas').innerHTML=meds.length
+    ?meds.map(m=>`<div class="sc ${m.cl}"><div class="sv">${esc(m.v)}<span style="font-size:11px;font-weight:400;color:var(--t2)"> ${m.u}</span></div><div class="sl">${m.l}</div></div>`).join('')
+    :'<div class="sc" style="grid-column:span 2"><div class="empty"><div class="empty-icon">📏</div><div class="empty-txt">Sin medidas</div></div></div>';
 
-  // Membresía
-  const memRows=[
-    {l:'Plan',v:c.plan||c.membership},
+  // Membresía — campos que guarda tu app en el cliente
+  const mem=[
+    {l:'Plan',v:c.plan||c.membership||c.planType},
+    {l:'Estado',v:c.status},
     {l:'Inicio',v:fmt(c.startDate||c.start)},
     {l:'Vencimiento',v:fmt(c.endDate||c.end||c.expiry)},
-    {l:'Precio mensual',v:c.price?'$'+Number(c.price).toLocaleString():null},
-    {l:'Estado',v:c.status},
-  ].filter(r=>r.v);
-  $('card-membresia').innerHTML=memRows.length
-    ? memRows.map(r=>`<div class="info-row"><span class="info-lbl">${esc(r.l)}</span><span class="info-val">${esc(r.v)}</span></div>`).join('')
-    : '<div class="empty"><div class="empty-icon">🗓️</div><div class="empty-txt">Sin datos de membresía</div></div>';
+    {l:'Precio mensual',v:c.price?'$'+fmtMoney(c.price):null},
+  ].filter(r=>r.v&&r.v!=='—');
+  $('card-membresia').innerHTML=mem.length
+    ?mem.map(r=>`<div class="info-row"><span class="info-lbl">${esc(r.l)}</span><span class="info-val">${esc(r.v)}</span></div>`).join('')
+    :'<div class="empty"><div class="empty-icon">🗓️</div><div class="empty-txt">Sin membresía registrada</div></div>';
 }
 
-/* ── RENDER: PAGOS ── */
+/* ─── PAGOS ─── */
+// campos: {id, amount, date, nextDate, method, concept, notes}
 function renderPagos(payments){
   const el=$('card-pagos');
-  if(!payments||!payments.length){return;}
+  if(!payments||!payments.length)return;
   const sorted=[...payments].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
-  const total=sorted.reduce((s,p)=>s+Number(p.amount||0),0);
+  const total=sorted.reduce((s,p)=>s+parseFloat(p.amount||0),0);
   el.innerHTML=`
     <div class="card-hdr">
       <span class="card-hdr-title">Historial de pagos</span>
-      <span class="card-hdr-count">${sorted.length} registros</span>
+      <span class="card-hdr-count">${sorted.length}</span>
     </div>
-    <div style="padding:12px 14px;background:rgba(200,255,87,.04);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:12px;color:var(--t2)">Total pagado</span>
-      <span style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--ac)">$${total.toLocaleString()}</span>
+    <div class="total-bar">
+      <span class="total-lbl">Total pagado</span>
+      <span class="total-val">$${fmtMoney(total)}</span>
     </div>
     ${sorted.map(p=>`
     <div class="pay-item">
       <div class="pay-icon">💳</div>
       <div class="pay-body">
-        <div class="pay-desc">${esc(p.concept||p.type||p.description||'Pago')}</div>
-        <div class="pay-date">${fmt(p.date)}</div>
+        <div class="pay-desc">${esc(p.concept||'Pago')}</div>
+        <div class="pay-sub">${fmt(p.date)}${p.method?' · '+esc(p.method):''}${p.notes?' · '+esc(p.notes):''}</div>
       </div>
       <div class="pay-right">
-        <div class="pay-amount">$${Number(p.amount||0).toLocaleString()}</div>
-        <div class="pay-status ${p.status==='pendiente'?'pending':'paid'}">${esc(p.status||'pagado')}</div>
+        <div class="pay-amount">$${fmtMoney(p.amount)}</div>
+        ${p.nextDate?`<div class="pay-next">Próximo: ${fmt(p.nextDate)}</div>`:''}
       </div>
     </div>`).join('')}`;
 }
 
-/* ── RENDER: PROGRESO ── */
+/* ─── PROGRESO ─── */
+// campos: {id, date, weight, fat, chest, waist, hip, glute, thigh, calf, arm, abdomen, notes}
 function renderProgreso(progress){
   const el=$('card-progreso');
-  if(!progress||!progress.length){return;}
+  if(!progress||!progress.length)return;
   const sorted=[...progress].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
   el.innerHTML=`
     <div class="card-hdr">
       <span class="card-hdr-title">Registros de progreso</span>
-      <span class="card-hdr-count">${sorted.length} entradas</span>
+      <span class="card-hdr-count">${sorted.length}</span>
     </div>
     ${sorted.map((r,i)=>{
-      const stats=[];
-      if(r.weight)stats.push({v:r.weight+' kg',l:'Peso'});
-      if(r.fat)stats.push({v:r.fat+'%',l:'Grasa'});
-      if(r.muscle)stats.push({v:r.muscle+'%',l:'Músculo'});
-      if(r.waist)stats.push({v:r.waist+' cm',l:'Cintura'});
-      if(r.chest)stats.push({v:r.chest+' cm',l:'Pecho'});
-      if(r.arms)stats.push({v:r.arms+' cm',l:'Brazos'});
-      if(r.hips)stats.push({v:r.hips+' cm',l:'Cadera'});
+      const stats=[
+        {v:r.weight,u:'kg',l:'Peso'},
+        {v:r.fat,u:'%',l:'Grasa'},
+        {v:r.chest,u:'cm',l:'Pecho'},
+        {v:r.waist,u:'cm',l:'Cintura'},
+        {v:r.hip,u:'cm',l:'Cadera'},
+        {v:r.glute,u:'cm',l:'Glúteo'},
+        {v:r.thigh,u:'cm',l:'Muslo'},
+        {v:r.calf,u:'cm',l:'Pantorrilla'},
+        {v:r.arm,u:'cm',l:'Brazo'},
+        {v:r.abdomen,u:'cm',l:'Abdomen'},
+      ].filter(s=>s.v);
       return`<div class="prog-item">
         <div class="prog-header">
           <span class="prog-date">${fmt(r.date)}</span>
           ${i===0?'<span class="prog-tag">Más reciente</span>':''}
         </div>
-        ${stats.length?`<div class="prog-grid">${stats.map(s=>`<div class="prog-stat"><div class="prog-stat-val">${esc(s.v)}</div><div class="prog-stat-lbl">${s.l}</div></div>`).join('')}</div>`:''}
+        ${stats.length?`<div class="prog-grid">${stats.map(s=>`
+          <div class="prog-stat">
+            <div class="prog-stat-val">${esc(s.v)}<span style="font-size:9px;font-weight:400;color:var(--t2)"> ${s.u}</span></div>
+            <div class="prog-stat-lbl">${s.l}</div>
+          </div>`).join('')}</div>`:''}
         ${r.notes?`<div class="prog-note">📝 ${esc(r.notes)}</div>`:''}
       </div>`;
     }).join('')}`;
 }
 
-/* ── RENDER: RUTINAS ── */
+/* ─── RUTINAS ─── */
+// campos: {id, name, days, duration, types, exercises:[{name,sets,reps,rest}], notes}
 function renderRutinas(routines){
   const el=$('card-rutinas');
-  if(!routines||!routines.length){return;}
+  if(!routines||!routines.length)return;
   el.innerHTML=`
     <div class="card-hdr">
       <span class="card-hdr-title">Mis rutinas</span>
-      <span class="card-hdr-count">${routines.length} rutinas</span>
+      <span class="card-hdr-count">${routines.length}</span>
     </div>
-    ${routines.map((r,ri)=>`
-    <div class="routine-item">
-      <div class="routine-header">
-        <div class="routine-dot"></div>
-        <div class="routine-info">
-          <div class="routine-name">${esc(r.name||'Rutina '+(ri+1))}</div>
-          <div class="routine-meta">${[r.day,r.type,r.duration?(r.duration+' min'):null].filter(Boolean).map(esc).join(' · ')||'Sin detalles'}</div>
+    ${routines.map((r,ri)=>{
+      const sub=[r.days,r.types,r.duration?(r.duration+' min'):null].filter(Boolean).join(' · ');
+      const exs=r.exercises||[];
+      return`<div class="acc-item">
+        <div class="acc-hdr">
+          <div class="acc-dot acc-dot-pu"></div>
+          <div class="acc-main">
+            <div class="acc-title">${esc(r.name||'Rutina '+(ri+1))}</div>
+            ${sub?`<div class="acc-sub">${esc(sub)}</div>`:''}
+          </div>
+          <span class="acc-arrow">›</span>
         </div>
-        <span class="routine-arrow">›</span>
-      </div>
-      <div class="routine-body">
-        <div class="ex-list">
-          ${(r.exercises||[]).length?r.exercises.map((e,ei)=>`
-          <div class="ex-row">
-            <div class="ex-num">${ei+1}</div>
-            <div class="ex-info">
-              <div class="ex-name">${esc(e.name||e||'Ejercicio')}</div>
-              <div class="ex-detail">${[e.sets?(e.sets+' series'):null,e.reps?(e.reps+' reps'):null,e.weight?(e.weight+' kg'):null,e.rest?('Descanso: '+e.rest+'s'):null].filter(Boolean).join(' · ')||''}</div>
-            </div>
-          </div>`).join(''):'<div style="color:var(--t3);font-size:12px;padding:4px 0">Sin ejercicios detallados</div>'}
+        <div class="acc-body">
+          ${exs.length?`<div class="ex-list">${exs.map((e,ei)=>`
+            <div class="ex-row">
+              <div class="ex-num">${ei+1}</div>
+              <div class="ex-info">
+                <div class="ex-name">${esc(e.name||'Ejercicio')}</div>
+                <div class="ex-detail">${[e.sets?(e.sets+' series'):null,e.reps?(e.reps+' reps'):null,e.rest?(e.rest+'s descanso'):null].filter(Boolean).join(' · ')}</div>
+              </div>
+            </div>`).join('')}</div>`:'<div style="font-size:12px;color:var(--t3)">Sin ejercicios detallados</div>'}
+          ${r.notes?`<div class="prog-note" style="margin-top:8px">📝 ${esc(r.notes)}</div>`:''}
         </div>
-        ${r.notes?`<div style="margin-top:8px;padding:9px 11px;background:var(--s2);border-radius:var(--r2);border:1px solid var(--bd);font-size:12px;color:var(--t2)">📝 ${esc(r.notes)}</div>`:''}
-      </div>
-    </div>`).join('')}`;
-  makeAccordion(el);
+      </div>`;
+    }).join('')}`;
+  initAccordions(el);
 }
 
-/* ── RENDER: COMIDAS ── */
-function renderComidas(meals){
+/* ─── COMIDAS ─── */
+// plan: {id, name, calories, protein, carbs, fats, meals:[{time,food}], notes}
+function renderComidas(plans){
   const el=$('card-comidas');
-  if(!meals||!meals.length){return;}
-  const totalCal=meals.reduce((s,m)=>s+Number(m.calories||0),0);
+  if(!plans||!plans.length)return;
+  const mealEmoji=name=>{
+    const n=(name||'').toLowerCase();
+    if(n.includes('desayuno'))return'🍳';
+    if(n.includes('almuerzo'))return'🍽️';
+    if(n.includes('cena'))return'🌙';
+    if(n.includes('merienda')||n.includes('snack'))return'🍎';
+    if(n.includes('pre'))return'⚡';
+    if(n.includes('post'))return'💪';
+    return'🥗';
+  };
+  const totalCal=plans.reduce((s,p)=>s+Number(p.calories||0),0);
   el.innerHTML=`
     <div class="card-hdr">
       <span class="card-hdr-title">Plan alimenticio</span>
-      ${totalCal?`<span class="card-hdr-count">${totalCal} kcal/día</span>`:''}
+      ${totalCal?`<span class="card-hdr-count">${totalCal} kcal</span>`:''}
     </div>
-    ${meals.map((m,mi)=>`
-    <div class="meal-item">
-      <div class="meal-header">
-        <div class="meal-emoji">${mealEmoji(m.name||m.type||'')}</div>
-        <div class="meal-info">
-          <div class="meal-name">${esc(m.name||m.type||'Comida '+(mi+1))}</div>
-          ${m.calories?`<div class="meal-cal">${m.calories} kcal</div>`:m.time?`<div class="meal-cal">${esc(m.time)}</div>`:''}
+    ${plans.map((plan,pi)=>{
+      const foods=plan.meals||[]; // array de {time, food}
+      const hasMacros=plan.protein||plan.carbs||plan.fats;
+      return`<div class="acc-item">
+        <div class="acc-hdr">
+          <div class="acc-dot acc-dot-yw"></div>
+          <div class="acc-main">
+            <div class="acc-title">${mealEmoji(plan.name)} ${esc(plan.name||'Plan '+(pi+1))}</div>
+            ${plan.calories?`<div class="acc-sub">${plan.calories} kcal</div>`:''}
+          </div>
+          <span class="acc-arrow">›</span>
         </div>
-        <span class="meal-arrow">›</span>
-      </div>
-      <div class="meal-body">
-        <div class="food-list">
-          ${(m.foods||[]).length?m.foods.map(f=>{
-            const parts=typeof f==='string'?[f]:[f.name||f,f.amount||f.portion].filter(Boolean);
-            return`<div class="food-row">${parts.map((p,i)=>i===0?`<strong>${esc(p)}</strong>`:esc(p)).join(' — ')}</div>`;
-          }).join(''):m.description?`<div class="food-row">${esc(m.description)}</div>`:'<div style="color:var(--t3);font-size:12px">Sin alimentos detallados</div>'}
+        <div class="acc-body">
+          ${foods.length?`<div class="food-list">${foods.map(f=>`
+            <div class="food-row">
+              ${f.time?`<span class="food-time">${esc(f.time)}</span>`:''}
+              <span class="food-name">${esc(f.food)}</span>
+            </div>`).join('')}</div>`:''}
+          ${hasMacros?`<div class="macros-row">
+            ${plan.protein?`<div class="macro-chip"><div class="macro-val" style="color:var(--ac)">${plan.protein}g</div><div class="macro-lbl">Proteína</div></div>`:''}
+            ${plan.carbs?`<div class="macro-chip"><div class="macro-val" style="color:var(--yw)">${plan.carbs}g</div><div class="macro-lbl">Carbos</div></div>`:''}
+            ${plan.fats?`<div class="macro-chip"><div class="macro-val" style="color:var(--pu)">${plan.fats}g</div><div class="macro-lbl">Grasas</div></div>`:''}
+          </div>`:''}
+          ${plan.notes?`<div class="prog-note" style="margin-top:8px">📝 ${esc(plan.notes)}</div>`:''}
         </div>
-        ${m.notes?`<div class="meal-note">📝 ${esc(m.notes)}</div>`:''}
-        ${m.macros?`<div style="display:flex;gap:6px;margin-top:8px">
-          ${m.macros.protein?`<div class="prog-stat" style="flex:1"><div class="prog-stat-val" style="color:var(--ac)">${m.macros.protein}g</div><div class="prog-stat-lbl">Proteína</div></div>`:''}
-          ${m.macros.carbs?`<div class="prog-stat" style="flex:1"><div class="prog-stat-val" style="color:var(--yw)">${m.macros.carbs}g</div><div class="prog-stat-lbl">Carbos</div></div>`:''}
-          ${m.macros.fat?`<div class="prog-stat" style="flex:1"><div class="prog-stat-val" style="color:var(--pu)">${m.macros.fat}g</div><div class="prog-stat-lbl">Grasa</div></div>`:''}
-        </div>`:''}
-      </div>
-    </div>`).join('')}`;
-  makeAccordion(el);
+      </div>`;
+    }).join('')}`;
+  initAccordions(el);
 }
 
-/* ── LOAD DATA ── */
+/* ─── LOAD DATA ─── */
 async function loadData(){
   const{trainerId,clientId}=getParams();
   if(!trainerId||!clientId){showError('Link inválido. Pide a tu entrenador el link correcto.');return;}
   try{
     const ctrl=new AbortController();
-    const tid=setTimeout(()=>ctrl.abort(),15000);
+    setTimeout(()=>ctrl.abort(),15000);
     const res=await fetch(FIREBASE_URL+'/trainers/'+trainerId+'.json',{signal:ctrl.signal});
-    clearTimeout(tid);
     if(!res.ok)throw new Error('HTTP '+res.status);
     const payload=await res.json();
     if(!payload)throw new Error('Sin datos');
     const client=(payload.clients||[]).find(c=>String(c.id)===String(clientId));
     if(!client){showError('No se encontró tu perfil. Pide a tu entrenador que sincronice de nuevo.');return;}
 
-    // Show
     $('loading').style.display='none';
-    const main=$('main');
-    main.style.display='flex';
-    main.style.flexDirection='column';
+    const main=$('main');main.style.display='flex';main.style.flexDirection='column';
     document.title=(client.name||'Mi Perfil')+' · Abreu Manager';
+
     if(payload.syncedAt){
       const d=new Date(payload.syncedAt);
       $('synced-at').textContent='Sync '+d.toLocaleDateString('es-DO',{day:'2-digit',month:'short'});
@@ -543,8 +569,9 @@ async function loadData(){
     renderComidas(payload['meals_'+clientId]);
 
   }catch(e){
-    const msg=e.name==='AbortError'?'Sin conexión a internet. Verifica tu red e intenta de nuevo.':'No se pudo cargar el perfil. Intenta de nuevo más tarde.';
-    showError(msg);
+    showError(e.name==='AbortError'
+      ?'Sin conexión. Verifica tu internet e intenta de nuevo.'
+      :'No se pudo cargar el perfil. Intenta de nuevo más tarde.');
   }
 }
 
